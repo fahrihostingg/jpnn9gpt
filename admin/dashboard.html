@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-row relative select-none overflow-x-hidden">
+
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#14151f] border-r border-zinc-800/80 transform -translate-x-full lg:translate-x-0 lg:static lg:flex transition-transform duration-300 ease-in-out flex flex-col shadow-2xl shrink-0">
+        <div class="p-5 border-b border-zinc-900/60 flex justify-between items-center">
+            <div class="text-xs font-black tracking-wider text-red-500 uppercase">
+                ADMIN DASHBOARD 
+            </div>
+            <button onclick="toggleSidebarMenu()" class="text-zinc-500 hover:text-white transition lg:hidden p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 flex-grow space-y-5 overflow-y-auto">
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Navigasi Utama</div>
+                <div class="space-y-1">
+                    <a href="/admin/dashboard" class="w-full text-xs font-bold text-white bg-zinc-900/80 border border-red-500/30 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-gauge text-red-500 w-4 text-center text-sm"></i>
+                        <span>DASHBOARD SYSTEM</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Akses Menu</div>
+                <div class="space-y-1">
+                    <a href="/admin/tambah-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-plus text-red-500 w-4 text-center"></i>
+                        <span>TAMBAH PRODUK</span>
+                    </a>
+                    <a href="/admin/hapus-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-trash text-red-500 w-4 text-center"></i>
+                        <span>HAPUS PRODUK</span>
+                    </a>
+                    <a href="/admin/edit-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-pen-to-square text-red-500 w-4 text-center"></i>
+                        <span>EDIT PRODUK</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Sistem Pre-Order (PO)</div>
+                <div class="space-y-1">
+                    <a href="/admin/addproduk-po.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-clock text-red-500 w-4 text-center"></i>
+                        <span>UPLOAD PRODUK PO</span>
+                    </a>
+                    <a href="/admin/send-data-po.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-paper-plane text-red-500 w-4 text-center"></i>
+                        <span>SEND DATA PO</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Pasar & Transaksi</div>
+                <div class="space-y-1">
+                    <a href="/listproduk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-boxes-stacked text-red-500 w-4 text-center"></i>
+                        <span>MARKET PRODUK</span>
+                    </a>
+                    <a href="/admin/riwayat-pembelian.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl  transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-clock-rotate-left text-red-500 w-4 text-center"></i>
+                        <span>RIWAYAT PEMBELIAN</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Sistem Komunikasi</div>
+                <div class="space-y-1">
+                    <a href="/owner/broadcast" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-bullhorn text-red-500 w-4 text-center"></i>
+                        <span>BUAT BROADCAST</span>
+                    </a>
+                    <a href="/owner/list-broadcast" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-rectangle-list text-red-500 w-4 text-center"></i>
+                        <span>MANAGE BROADCAST</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Finansial & Saldo</div>
+                <div class="space-y-1">
+                    <a href="/admin/penarikan.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-money-bill-transfer text-red-500 w-4 text-center"></i>
+                        <span>PENARIKAN SALDO</span>
+                    </a>
+                    <a href="/admin/riwayat-penarikan.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-clock-rotate-left text-red-500 w-4 text-center"></i>
+                        <span>RIWAYAT WD</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebarOverlay" onclick="toggleSidebarMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-all duration-300 lg:hidden"></div>
+
+    <div class="flex-grow flex flex-col min-h-screen w-full min-w-0 overflow-x-hidden">
+        
+        <header class="w-full bg-[#14151f]/50 border-b border-zinc-800/80 px-4 sm:px-6 py-4 flex justify-between items-center shrink-0 sticky top-0 backdrop-blur-md z-30">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebarMenu()" class="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-95 lg:hidden">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div class="text-xs sm:text-sm text-zinc-400 font-extrabold uppercase tracking-wider">Console Admin System</div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="/dashboard" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold px-3.5 py-2.5 rounded-xl border border-zinc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span class="hidden sm:inline">Dashboard User</span>
+                </a>
+                <a href="/logout" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-red-400 font-bold px-3.5 py-2.5 rounded-xl border border-zinc-800 transition flex items-center">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-grow p-4 sm:p-6 space-y-6 w-full max-w-4xl mx-auto">
+
+            <div id="liveBroadcastBox" onclick="openBroadcastModal()" class="hidden w-full p-4.5 rounded-2xl border flex items-start gap-3.5 transition shadow-2xl cursor-pointer hover:scale-[1.01] active:scale-[0.99]">
+                <div id="liveBroadcastIcon" class="w-9 h-9 rounded-xl flex items-center justify-center text-sm shrink-0 shadow-lg"></div>
+                <div class="flex-grow min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                        <span id="liveBroadcastBadge" class="text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider"></span>
+                        <span id="liveBroadcastTime" class="text-[9px] text-zinc-600 font-mono uppercase"></span>
+                    </div>
+                    <h4 id="liveBroadcastTitle" class="text-xs font-black text-white uppercase tracking-wide mt-1.5 truncate"></h4>
+                    <p id="liveBroadcastMessage" class="text-[11px] text-zinc-400 font-medium mt-0.5 leading-relaxed truncate"></p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-[#14151f] to-[#12131a] border border-zinc-800 rounded-2xl p-5 flex items-center justify-between shadow-xl">
+                <div class="space-y-0.5">
+                    <span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <i class="fa-solid fa-wallet text-red-500 text-xs"></i> DOMPET UTAMA ADMIN
+                    </span>
+                    <h2 id="mainSaldoAdmin" class="text-2xl font-extrabold text-emerald-400 tracking-tight">Rp 0</h2>
+                </div>
+                <a href="/deposit" class="text-xs bg-red-600 hover:bg-red-700 text-white font-black px-5 py-3 rounded-xl transition active:scale-[0.97] shadow-lg shadow-red-600/10 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-sm"></i>
+                    <span>DEPOSIT</span>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-[#14151f] border border-zinc-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between min-h-[115px]">
+                    <div>
+                        <p class="text-zinc-500 text-[10px] uppercase font-black tracking-wider">TOTAL PENDAPATAN</p>
+                        <h3 id="totalPendapatan" class="text-2xl font-black text-emerald-400 tracking-tight mt-1">Rp 0</h3>
+                    </div>
+                    <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-3">Barsih setelah potongan</div>
+                </div>
+
+                <div class="bg-[#14151f] border border-zinc-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between min-h-[115px]">
+                    <div>
+                        <p class="text-zinc-500 text-[10px] uppercase font-black tracking-wider">TOTAL PENJUALAN</p>
+                        <h3 id="totalPenjualan" class="text-2xl font-black text-blue-400 tracking-tight mt-1">0 Transaksi</h3>
+                    </div>
+                    <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-3">Jumlah sukses terjual</div>
+                </div>
+
+                <div class="bg-[#14151f] border border-zinc-800 p-5 rounded-2xl shadow-xl flex flex-col justify-between min-h-[115px]">
+                    <div>
+                        <p class="text-zinc-500 text-[10px] uppercase font-black tracking-wider">POTONGAN ADMIN</p>
+                        <h3 id="totalPotonganAdmin" class="text-2xl font-black text-red-400 tracking-tight mt-1">Rp 0</h3>
+                    </div>
+                    <div class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mt-3">Akumulasi fee system</div>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                    <i class="fa-solid fa-money-bill-wave mr-1 text-red-500"></i> MANAJEMEN PENCAIRAN DANA STORE
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="/admin/penarikan.html" class="p-5 bg-gradient-to-br from-[#14151f] to-[#131916] border border-zinc-800 hover:border-emerald-500/30 rounded-2xl transition flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div class="space-y-0.5">
+                            <span class="block text-sm font-black text-white group-hover:text-emerald-400 transition tracking-wide">TARIK SALDO PENDAPATAN</span>
+                            <span class="text-xs text-zinc-500 block">Cairkan uang jualan ke e-wallet / bank</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-emerald-400 transition">
+                            <i class="fa-solid fa-building-columns text-base"></i>
+                        </div>
+                    </a>
+                    <a href="/admin/riwayat-penarikan.html" class="p-5 bg-gradient-to-br from-[#14151f] to-[#191813] border border-zinc-800 hover:border-amber-500/30 rounded-2xl transition flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div class="space-y-0.5">
+                            <span class="block text-sm font-black text-white group-hover:text-amber-400 transition tracking-wide">RIWAYAT PENARIKAN (WD)</span>
+                            <span class="text-xs text-zinc-500 block">Pantau mutasi audit dan status penarikan dana</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-amber-400 transition">
+                            <i class="fa-solid fa-clock-rotate-left text-base"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                    <i class="fa-solid fa-sliders mr-1 text-red-500"></i> SETUP UTAMA MERCHANT TOKO
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="/admin/buat-merchant.html" class="p-5 bg-gradient-to-br from-[#14151f] to-[#181212] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div class="space-y-0.5">
+                            <span class="block text-sm font-black text-white group-hover:text-red-400 transition tracking-wide">BUAT NAMA TOKO</span>
+                            <span class="text-xs text-zinc-500 block">Daftar & buat identitas toko barumu</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-red-500 transition">
+                            <i class="fa-solid fa-store text-base"></i>
+                        </div>
+                    </a>
+                    <a href="/admin/toko-saya.html" class="p-5 bg-gradient-to-br from-[#14151f] to-[#12161c] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div class="space-y-0.5">
+                            <span class="block text-sm font-black text-white group-hover:text-red-400 transition tracking-wide">TOKO SAYA</span>
+                            <span class="text-xs text-zinc-500 block">Buka halaman etalase live toko saya</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-red-500 transition">
+                            <i class="fa-solid fa-shop text-base"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="space-y-2.5">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                    <i class="fa-solid fa-box-open mr-1 text-red-500"></i> KONTROL INVENTORI PRODUK
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <a href="/admin/tambah-produk.html" class="p-4 bg-[#14151f] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition text-left flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div>
+                            <span class="block text-xs font-black text-white group-hover:text-red-400 transition uppercase tracking-wide">ADD PRODUK</span>
+                            <span class="text-[10px] text-zinc-500 block mt-0.5">Upload item</span>
+                        </div>
+                        <i class="fa-solid fa-circle-plus text-zinc-600 group-hover:text-red-500 transition text-base shrink-0 ml-1"></i>
+                    </a>
+                    <a href="/admin/hapus-produk.html" class="p-4 bg-[#14151f] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition text-left flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div>
+                            <span class="block text-xs font-black text-white group-hover:text-red-400 transition uppercase tracking-wide">DEL PRODUK</span>
+                            <span class="text-[10px] text-zinc-500 block mt-0.5">Hapus item</span>
+                        </div>
+                        <i class="fa-solid fa-circle-minus text-zinc-600 group-hover:text-red-500 transition text-base shrink-0 ml-1"></i>
+                    </a>
+                    <a href="/admin/list-produk.html" class="p-4 bg-[#14151f] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition text-left flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div>
+                            <span class="block text-xs font-black text-white group-hover:text-red-400 transition uppercase tracking-wide">LIST PRODUK</span>
+                            <span class="text-[10px] text-zinc-500 block mt-0.5">Inventori</span>
+                        </div>
+                        <i class="fa-solid fa-list-check text-zinc-600 group-hover:text-red-500 transition text-base shrink-0 ml-1"></i>
+                    </a>
+                    <a href="/admin/edit-produk.html" class="p-4 bg-[#14151f] border border-zinc-800 hover:border-red-500/30 rounded-2xl transition text-left flex items-center justify-between group active:scale-[0.99] shadow-lg">
+                        <div>
+                            <span class="block text-xs font-black text-white group-hover:text-red-400 transition uppercase tracking-wide">EDIT PRODUK</span>
+                            <span class="text-[10px] text-zinc-500 block mt-0.5">Ubah harga</span>
+                        </div>
+                        <i class="fa-solid fa-pen-to-square text-zinc-600 group-hover:text-red-500 transition text-base shrink-0 ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="space-y-2.5 pt-2">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                    <i class="fa-solid fa-circle-info mr-1 text-red-500"></i> DATABASE KONFIGURASI MERCHANT AKTIF
+                </div>
+                <div class="w-full bg-[#14151f] border border-zinc-800 rounded-2xl shadow-xl p-5">
+                    <div id="merchantContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:col-span-2">
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">NAMA TOKO :</span>
+                                <span id="mchNamaToko" class="text-sm font-extrabold text-white tracking-wide block mt-1">Belum Dibuat</span>
+                            </div>
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">EMAIL PEMILIK TOKO :</span>
+                                <span id="mchEmailPemilik" class="text-xs font-bold text-zinc-400 block mt-1">-</span>
+                            </div>
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl sm:col-span-2 md:col-span-1">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">NOMOR PEMILIK TOKO :</span>
+                                <span id="mchNomorPemilik" class="text-xs font-mono text-zinc-400 block mt-1">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:border-l md:border-zinc-800/80 md:pl-6">
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">METODE PENCAIRAN SALDO :</span>
+                                <span id="mchMetode" class="inline-block text-[10px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider mt-1.5">-</span>
+                            </div>
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">NOMOR PENCAIRAN SALDO :</span>
+                                <span id="mchNoPencairan" class="text-xs font-mono text-white block mt-1">-</span>
+                            </div>
+                            <div class="bg-[#0f1015] border border-zinc-800/60 p-3.5 rounded-xl sm:col-span-2 md:col-span-1">
+                                <span class="text-[10px] font-black text-zinc-500 uppercase tracking-wider block">STATUS MERCHANT :</span>
+                                <span id="mchStatus" class="inline-block text-[10px] font-black bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-md uppercase tracking-wider mt-1.5">INACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="broadcastModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="w-full max-w-md bg-[#14151f] border border-zinc-800 rounded-2xl p-6 shadow-2xl relative space-y-4 animate-[zoomIn_0.2s_ease-out]">
+            <button onclick="closeBroadcastModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="flex items-center gap-3 border-b border-zinc-800 pb-3">
+                <div id="modalBcIcon" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg"></div>
+                <div>
+                    <span id="modalBcBadge" class="text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider"></span>
+                    <h3 id="modalBcTitle" class="text-sm font-black text-white mt-1 uppercase tracking-wide"></h3>
+                </div>
+            </div>
+            <div class="bg-[#0f1015] border border-zinc-800 p-4 rounded-xl max-h-60 overflow-y-auto">
+                <p id="modalBcMessage" class="text-xs text-zinc-300 font-medium leading-relaxed whitespace-pre-wrap break-words"></p>
+            </div>
+            <button onclick="closeBroadcastModal()" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-black tracking-wider rounded-xl text-white uppercase transition">
+                Mengerti & Tutup
+            </button>
+        </div>
+    </div>
+
+    <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-3">
+        <button onclick="toggleAiModal()" class="w-14 h-14 bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.4)] transition active:scale-95 group relative">
+            <i class="fa-solid fa-robot text-xl group-hover:rotate-12 transition"></i>
+            <span class="absolute right-16 bg-[#14151f] border border-zinc-800 text-[10px] font-black text-emerald-400 px-3 py-1.5 rounded-lg whitespace-nowrap uppercase tracking-wider opacity-0 group-hover:opacity-100 transition shadow-xl pointer-events-none">AI Assistant</span>
+        </button>
+    </div>
+
+    <div id="aiChatModal" class="fixed bottom-24 right-5 z-50 w-[90%] sm:w-[380px] bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl hidden flex-col overflow-hidden max-h-[480px]">
+        <div class="p-4 bg-gradient-to-r from-[#171824] to-[#14151f] border-b border-zinc-900 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div>
+                    <h3 class="text-xs font-black text-white uppercase tracking-wide">AI CORE SYSTEM ASSISTANT</h3>
+                    <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Automated Support Store</p>
+                </div>
+            </div>
+            <button onclick="toggleAiModal()" class="text-zinc-500 hover:text-white transition p-1">
+                <i class="fa-solid fa-minus text-sm"></i>
+            </button>
+        </div>
+
+        <div id="aiChatBody" class="flex-grow overflow-y-auto p-4 space-y-3 min-h-[250px] max-h-[320px] bg-[#0f1015]">
+            <div class="flex gap-2.5 items-start max-w-[85%]">
+                <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shrink-0 text-xs">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800/80 px-3 py-2.5 rounded-2xl rounded-tl-none">
+                    <p class="text-[11px] font-medium text-zinc-300 leading-relaxed">Halo Admin! Ada yang bisa saya bantu untuk memantau data server atau produk hari ini?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 bg-[#11121b] border-t border-zinc-900 flex gap-2">
+            <input type="text" id="aiChatInput" placeholder="Ketik pesan untuk AI..." class="flex-grow bg-[#0f1015] border border-zinc-800 rounded-xl px-3 text-xs text-white focus:outline-none focus:border-emerald-500/50 font-medium placeholder-zinc-600">
+            <button onclick="sendAiMessage()" class="w-9 h-9 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl flex items-center justify-center transition shrink-0 active:scale-95">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let cachedBroadcast = null;
+
+        function toggleSidebarMenu() {
+            const sidebar = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            if(sidebar && overlay) {
+                sidebar.classList.toggle("-translate-x-full");
+                overlay.classList.toggle("hidden");
+            }
+        }
+
+        function playSystemSound(type) {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = context.createOscillator();
+            const gain = context.createGain();
+            osc.connect(gain);
+            gain.connect(context.destination);
+
+            if (type === 'popup') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, context.currentTime); 
+                osc.frequency.setValueAtTime(880.00, context.currentTime + 0.08); 
+                gain.gain.setValueAtTime(0.08, context.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.25);
+                osc.start();
+                osc.stop(context.currentTime + 0.25);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, context.currentTime);
+                gain.gain.setValueAtTime(0.05, context.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.08);
+                osc.start();
+                osc.stop(context.currentTime + 0.08);
+            }
+        }
+
+        function fetchLiveBroadcast() {
+            fetch('/api/owner/broadcast')
+                .then(res => res.json())
+                .then(res => {
+                    const box = document.getElementById('liveBroadcastBox');
+                    if (res.success && res.data && res.data.status === 'aktif') {
+                        cachedBroadcast = res.data;
+                        const d = res.data;
+                        const icon = document.getElementById('liveBroadcastIcon');
+                        const badge = document.getElementById('liveBroadcastBadge');
+                        const title = document.getElementById('liveBroadcastTitle');
+                        const msg = document.getElementById('liveBroadcastMessage');
+                        const time = document.getElementById('liveBroadcastTime');
+
+                        title.innerText = d.title.toUpperCase();
+                        msg.innerText = d.message;
+                        time.innerText = d.updatedAt ? new Date(d.updatedAt).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) : '';
+                        
+                        box.classList.add('hidden');
+
+                        if (d.type === 'danger') {
+                            badge.innerText = "DARURAT";
+                        } else if (d.type === 'warning') {
+                            badge.innerText = "PERINGATAN";
+                        } else if (d.type === 'success') {
+                            badge.innerText = "PROMO / SUKSES";
+                        } else {
+                            badge.innerText = "INFORMASI";
+                        }
+
+                        openBroadcastModal();
+                    } else {
+                        box.classList.add('hidden');
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function openBroadcastModal() {
+            if (!cachedBroadcast) return;
+            playSystemSound('popup');
+            
+            const modal = document.getElementById('broadcastModal');
+            const icon = document.getElementById('modalBcIcon');
+            const badge = document.getElementById('modalBcBadge');
+            const title = document.getElementById('modalBcTitle');
+            const msg = document.getElementById('modalBcMessage');
+
+            title.innerText = cachedBroadcast.title.toUpperCase();
+            msg.innerText = cachedBroadcast.message;
+            
+            if (cachedBroadcast.type === 'danger') {
+                icon.className = "w-10 h-10 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 flex items-center justify-center text-base";
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                badge.className = "text-[9px] font-black bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded uppercase tracking-wider";
+                badge.innerText = "DARURAT";
+            } else if (cachedBroadcast.type === 'warning') {
+                icon.className = "w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-base";
+                icon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+                badge.className = "text-[9px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded uppercase tracking-wider";
+                badge.innerText = "PERINGATAN";
+            } else if (cachedBroadcast.type === 'success') {
+                icon.className = "w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base";
+                icon.innerHTML = `<i class="fa-solid fa-bullhorn"></i>`;
+                badge.className = "text-[9px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded uppercase tracking-wider";
+                badge.innerText = "PROMO / SUKSES";
+            } else {
+                icon.className = "w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-base";
+                icon.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+                badge.className = "text-[9px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded uppercase tracking-wider";
+                badge.innerText = "INFORMASI";
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeBroadcastModal() {
+            playSystemSound('click');
+            const modal = document.getElementById('broadcastModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function toggleAiModal() {
+            playSystemSound('click');
+            const modal = document.getElementById('aiChatModal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            
+            if (!modal.classList.contains('hidden')) {
+                const body = document.getElementById('aiChatBody');
+                body.scrollTop = body.scrollHeight;
+                setTimeout(() => { document.getElementById('aiChatInput').focus(); }, 100);
+            }
+        }
+
+        function sendAiMessage() {
+            const input = document.getElementById('aiChatInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            playSystemSound('click');
+            input.value = '';
+
+            const body = document.getElementById('aiChatBody');
+            
+            const userMsg = document.createElement('div');
+            userMsg.className = "flex gap-2.5 items-start justify-end max-w-[85%] ml-auto";
+            userMsg.innerHTML = `
+                <div class="bg-emerald-600 px-3 py-2.5 rounded-2xl rounded-tr-none text-white shadow-md shadow-emerald-600/10">
+                    <p class="text-[11px] font-medium leading-relaxed">${query}</p>
+                </div>
+            `;
+            body.appendChild(userMsg);
+            body.scrollTop = body.scrollHeight;
+
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = "flex gap-2.5 items-start max-w-[85%]";
+            loadingMsg.id = "ai-loading-indicator";
+            loadingMsg.innerHTML = `
+                <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shrink-0 text-xs">
+                    <i class="fa-solid fa-robot fa-spin"></i>
+                </div>
+                <div class="bg-zinc-900 border border-zinc-800/80 px-3 py-2.5 rounded-2xl rounded-tl-none text-zinc-500 italic text-[11px] tracking-wide">
+                    Mengonstruksi jawaban...
+                </div>
+            `;
+            body.appendChild(loadingMsg);
+            body.scrollTop = body.scrollHeight;
+
+            fetch(`/api/ai-assistant?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(res => {
+                    const loader = document.getElementById('ai-loading-indicator');
+                    if(loader) loader.remove();
+
+                    playSystemSound('popup');
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = "flex gap-2.5 items-start max-w-[85%]";
+                    aiMsg.innerHTML = `
+                        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-emerald-400 shrink-0 text-xs">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div class="bg-zinc-900 border border-zinc-800/80 px-3 py-2.5 rounded-2xl rounded-tl-none">
+                            <p class="text-[11px] font-medium text-zinc-300 leading-relaxed whitespace-pre-wrap break-words">${res.reply || 'Maaf, sistem AI sedang sibuk. Hubungi backend dev.'}</p>
+                        </div>
+                    `;
+                    body.appendChild(aiMsg);
+                    body.scrollTop = body.scrollHeight;
+                })
+                .catch(() => {
+                    const loader = document.getElementById('ai-loading-indicator');
+                    if(loader) loader.remove();
+                    
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = "flex gap-2.5 items-start max-w-[85%]";
+                    errorMsg.innerHTML = `
+                        <div class="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-red-400 shrink-0 text-xs">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div class="bg-red-950/20 border border-red-900/30 px-3 py-2.5 rounded-2xl rounded-tl-none text-red-400 text-[11px]">
+                            Gagal terhubung ke AI server engine.
+                        </div>
+                    `;
+                    body.appendChild(errorMsg);
+                    body.scrollTop = body.scrollHeight;
+                });
+        }
+
+        document.getElementById('aiChatInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendAiMessage();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchLiveBroadcast();
+
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.valid && data.user) {
+                        const saldo = parseInt(data.user.saldo || 0);
+                        const el = document.getElementById('mainSaldoAdmin');
+                        if(el) el.innerText = 'Rp ' + saldo.toLocaleString('id-ID');
+                    }
+                })
+                .catch(e => console.log('Gagal sinkronisasi saldo:', e));
+
+            fetch('/api/admin/finance-stats')
+                .then(res => res.json())
+                .then(res => {
+                    const invoices = Array.isArray(res) ? res : (res.data || []);
+                    
+                    let akumulasiPendapatan = 0;  
+                    let akumulasiPotongan = 0;    
+                    let totalTransaksiSukses = invoices.length; 
+
+                    invoices.forEach(inv => {
+                        const revenue = parseFloat(inv.finalSellerRevenue || 0);
+                        const fee = parseFloat(inv.adminFeeDeduction || 0);
+                        
+                        akumulasiPendapatan += revenue;
+                        akumulasiPotongan += fee;
+                    });
+
+                    const bersihPendapatan = Math.round(akumulasiPendapatan);
+                    const bersihPotongan = Math.round(akumulasiPotongan);
+
+                    const p = document.getElementById('totalPendapatan');
+                    const j = document.getElementById('totalPenjualan');
+                    const a = document.getElementById('totalPotonganAdmin');
+                    
+                    if(p) p.innerText = 'Rp ' + bersihPendapatan.toLocaleString('id-ID');
+                    if(j) j.innerText = totalTransaksiSukses.toLocaleString('id-ID') + ' Transaksi';
+                    if(a) a.innerText = 'Rp ' + bersihPotongan.toLocaleString('id-ID');
+                })
+                .catch(e => console.log('Gagal kalkulasi data finansial transaksi:', e));
+
+            fetch('/api/admin/merchant/info')
+                .then(res => res.json())
+                .then(res => {
+                    if (res && res.success && res.data) {
+                        const m = res.data;
+                        const nameEl = document.getElementById('mchNamaToko');
+                        const mailEl = document.getElementById('mchEmailPemilik');
+                        const phoneEl = document.getElementById('mchNomorPemilik');
+                        const methodEl = document.getElementById('mchMetode');
+                        const cashEl = document.getElementById('mchNoPencairan');
+                        const statusTag = document.getElementById('mchStatus');
+
+                        if(nameEl) nameEl.innerText = (m.namaToko || 'Belum Dibuat').toUpperCase();
+                        if(mailEl) mailEl.innerText = m.emailPemilik || '-';
+                        if(phoneEl) phoneEl.innerText = m.nomorPemilik || '-';
+                        if(methodEl) methodEl.innerText = m.metodePencairan || '-';
+                        if(cashEl) cashEl.innerText = m.nomorPencairan || '-';
+                        
+                        if (statusTag && m.status) {
+                            statusTag.innerText = m.status;
+                            if (m.status === 'ACTIVE') {
+                                statusTag.className = "inline-block text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider mt-1.5";
+                            }
+                        }
+                    }
+                })
+                .catch(e => console.log('Gagal load merchant info:', e));
+        });
+    </script>
+</body>
+</html>

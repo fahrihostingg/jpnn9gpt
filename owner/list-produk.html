@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daftar Produk Master - Owner Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-4xl mx-auto bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+                <a href="/owner/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase">LIST PRODUCT OWNER</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Console System Management - Khusus Produk Owner</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-crown text-red-500 text-xl drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]"></i>
+        </div>
+
+        <div id="loadingState" class="py-20 text-center">
+            <div class="w-8 h-8 border-4 border-t-red-500 border-zinc-800 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">Sedang mengambil database produk owner...</p>
+        </div>
+
+        <div id="emptyState" class="hidden bg-zinc-900/40 border border-zinc-800/60 p-12 rounded-2xl text-center">
+            <i class="fa-solid fa-box-open text-4xl text-zinc-700 mb-3"></i>
+            <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">Belum ada produk dari "PRODUK BY OWNER" yang tersimpan.</p>
+        </div>
+
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden"></div>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid || session.user.role !== 'owner') {
+                        window.location.href = '/login';
+                    } else {
+                        loadOwnerProducts();
+                    }
+                }).catch(() => { window.location.href = '/login'; });
+        });
+
+        function loadOwnerProducts() {
+            fetch('/api/owner/my-products')
+                .then(res => res.json())
+                .then(response => {
+                    document.getElementById('loadingState').classList.add('hidden');
+
+                    if (response.success && response.data && response.data.length > 0) {
+                        const container = document.getElementById('productsGrid');
+                        container.classList.remove('hidden');
+                        
+                        container.innerHTML = response.data.map(product => {
+                            const productImg = product.imageUrl || 'https://placehold.co/100x100/11121a/white?text=PRODUK';
+                            const idTarget = product.productId || product.id;
+                            const totalVariants = product.items ? product.items.length : 0;
+                            
+                            let hargaTampil = 0;
+                            let totalStok = 0;
+                            
+                            if (product.items && product.items.length > 0) {
+                                hargaTampil = product.items[0].harga || 0;
+                                product.items.forEach(item => {
+                                    totalStok += parseInt(item.stok || 0);
+                                });
+                            }
+
+                            return `
+                                <div class="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between space-y-4 shadow-xl">
+                                    <div class="flex gap-3 items-start">
+                                        <img src="${productImg}" class="w-14 h-14 rounded-xl object-cover border border-zinc-800 bg-[#11121a] shrink-0">
+                                        <div class="space-y-0.5 min-w-0 flex-grow text-left">
+                                            <span class="text-[9px] bg-zinc-900 border border-zinc-800 text-red-400 px-2 py-0.5 rounded font-mono inline-block mb-1 font-bold tracking-wide">${idTarget}</span>
+                                            <h3 class="text-xs font-black text-white uppercase tracking-wide truncate block">${product.productName || 'Tanpa Nama'}</h3>
+                                            <p class="text-zinc-500 text-[10px] font-bold uppercase block">Kategori: <span class="text-zinc-300">${product.category || 'PRODUK'}</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-[#0f1015] border border-zinc-800/60 rounded-xl p-2.5 flex justify-between items-center text-left">
+                                        <div class="flex flex-col">
+                                            <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Harga Utama</span>
+                                            <span class="text-xs font-extrabold text-emerald-400">Rp ${parseInt(hargaTampil).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Total Stok / Varian</span>
+                                            <span class="text-xs font-bold text-zinc-300">${totalStok} Pcs / ${totalVariants} Data</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex gap-2 pt-1">
+                                        <a href="/owner/edit-produk.html?id=${idTarget}" class="w-1/2 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold rounded-xl text-xs transition active:scale-[0.97] flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                                            <i class="fa-solid fa-pen-to-square text-red-500 text-[11px]"></i> Edit Data
+                                        </a>
+                                        <a href="/owner/hapus-produk.html?id=${idTarget}" class="w-1/2 py-2.5 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 text-red-400 font-bold rounded-xl text-xs transition active:scale-[0.97] flex items-center justify-center gap-1.5 uppercase tracking-wider">
+                                            <i class="fa-solid fa-trash-can text-[11px]"></i> Hapus Master
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        document.getElementById('emptyState').classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('emptyState').classList.remove('hidden');
+                });
+        }
+    </script>
+</body>
+</html>

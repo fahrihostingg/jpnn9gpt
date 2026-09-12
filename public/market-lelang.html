@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pasar Lelang Resmi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015; 
+        }
+        .font-mono { 
+            font-family: 'Fira Code', monospace; 
+        }
+        ::-webkit-scrollbar { 
+            width: 0px; 
+            background: transparent; 
+        }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-4xl mx-auto space-y-6 pb-24">
+        
+        <div class="flex items-center justify-between bg-[#14151f]/40 border border-zinc-800/60 p-5 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div>
+                    <h1 class="text-sm font-extrabold text-white tracking-widest uppercase">PASAR LELANG AKTIF</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">CARI PRODUK TERMURAH DI SINI.</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-gavel text-orange-500 text-lg"></i>
+        </div>
+
+        <div class="bg-[#14151f]/40 border border-zinc-800/60 p-5 rounded-2xl shadow-xl space-y-4">
+            <div class="relative flex items-center">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 text-zinc-500 text-xs"></i>
+                <input type="text" id="searchBar" oninput="jalankanFilter()" placeholder="CARI BARANG LELANG AKTIF..." class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl pl-11 pr-4 py-2.5 text-xs font-bold text-white placeholder-zinc-600 outline-none transition uppercase tracking-wider">
+            </div>
+            
+            <div class="grid grid-cols-4 gap-2">
+                <button type="button" onclick="filterDurasi('ALL')" id="btn-dur-ALL" class="dur-btn py-2.5 bg-[#1a1b26] border border-orange-500/20 border-b-2 border-b-orange-500 text-white rounded-xl font-bold text-[10px] tracking-wider transition uppercase shadow-md shadow-orange-500/5">SEMUA</button>
+                <button type="button" onclick="filterDurasi(1)" id="btn-dur-1" class="dur-btn py-2.5 bg-zinc-900/50 border border-zinc-800/60 text-zinc-400 rounded-xl font-bold text-[10px] tracking-wider transition uppercase hover:text-white">1 HARI</button>
+                <button type="button" onclick="filterDurasi(3)" id="btn-dur-3" class="dur-btn py-2.5 bg-zinc-900/50 border border-zinc-800/60 text-zinc-400 rounded-xl font-bold text-[10px] tracking-wider transition uppercase hover:text-white">3 HARI</button>
+                <button type="button" onclick="filterDurasi(7)" id="btn-dur-7" class="dur-btn py-2.5 bg-zinc-900/50 border border-zinc-800/60 text-zinc-400 rounded-xl font-bold text-[10px] tracking-wider transition uppercase hover:text-white">7 HARI</button>
+            </div>
+        </div>
+
+        <div id="gridLelang" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="col-span-full text-center p-12 bg-[#14151f]/40 border border-zinc-800/60 rounded-2xl">
+                <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">Memuat berkas komoditas lelang...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalBid" class="fixed inset-0 z-50 invisible flex items-center justify-center p-4 transition-all duration-300">
+        <div onclick="closeBidModal()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        
+        <div class="bg-[#14151f] border border-zinc-800/80 w-full max-w-md rounded-2xl p-6 shadow-2xl relative z-10 transform scale-95 opacity-0 transition-all duration-300" id="bidContainer">
+            <div class="flex justify-between items-center border-b border-zinc-900 pb-3">
+                <h3 class="text-white font-extrabold text-xs tracking-wider uppercase truncate max-w-[280px]" id="popNamaProduk">DETAIL ITEM</h3>
+                <button onclick="closeBidModal()" class="w-7 h-7 bg-zinc-900 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="py-4 space-y-4">
+                <div class="w-full h-44 rounded-xl border border-zinc-800 bg-[#0f1015] overflow-hidden flex items-center justify-center relative">
+                    <img id="popFoto" class="w-full h-full object-contain">
+                </div>
+                
+                <p id="popDeskripsi" class="text-xs text-zinc-400 font-medium leading-relaxed max-h-20 overflow-y-auto pr-1 uppercase tracking-wide"></p>
+                
+                <div class="grid grid-cols-2 gap-3 bg-zinc-900/40 p-4 rounded-xl border border-zinc-800/60">
+                    <div>
+                        <span class="text-[9px] font-bold text-zinc-500 uppercase block tracking-wider">TAWARAN SAAT INI</span>
+                        <span id="popHargaSekarang" class="text-sm font-black text-emerald-400">Rp 0</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-zinc-500 uppercase block tracking-wider">BELI SEKARANG</span>
+                        <span id="popHargaTinggi" class="text-sm font-black text-orange-500">Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5" id="bidInputWrapper">
+                    <label class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block">NOMINAL BID BARU (MINIMAL <span id="txtMinBid" class="text-emerald-400">Rp 0</span>) :</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-4 text-xs font-mono font-bold text-zinc-500">Rp</span>
+                        <input type="number" id="inputNominalBid" class="w-full bg-[#0f1015] border border-zinc-800 rounded-xl pl-10 pr-4 py-2.5 text-xs font-extrabold text-white outline-none focus:border-orange-500/20">
+                    </div>
+                </div>
+
+                <div class="border border-zinc-900 bg-zinc-950/20 p-3 rounded-xl space-y-2">
+                    <span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest block opacity-75">LOG REBUTAN HARGA (RIWAYAT BID) :</span>
+                    <div id="popListBids" class="space-y-1 font-mono text-[11px] max-h-24 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+
+            <div id="modalActionButtons" class="grid grid-cols-2 gap-3">
+                <button onclick="prosesBeliInstan()" class="py-3 bg-gradient-to-tr from-orange-500 to-red-600 text-white font-black text-xs tracking-widest rounded-xl uppercase transition active:scale-95 shadow-md shadow-orange-600/10">
+                    Beli Instan
+                </button>
+                <button onclick="prosesKirimBid()" class="py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs tracking-widest rounded-xl uppercase transition active:scale-95">
+                    Kirim Bid
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLelangId = null;
+        let selectedItem = null;
+        let currentUser = "";
+        let masterLelangData = [];
+        let filterDurasiAktif = "ALL";
+
+        document.addEventListener('DOMContentLoaded', muatProdukLelang);
+
+        function muatProdukLelang() {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(userData => {
+                    if (userData && userData.valid) {
+                        currentUser = userData.user.username;
+                    }
+                    return fetch('/api/lelang/list');
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        masterLelangData = res.data || [];
+                        jalankanFilter();
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function filterDurasi(durasi) {
+            filterDurasiAktif = durasi;
+            document.querySelectorAll('.dur-btn').forEach(btn => {
+                btn.className = "dur-btn py-2.5 bg-zinc-900/50 border border-zinc-800/60 text-zinc-400 rounded-xl font-bold text-[10px] tracking-wider transition uppercase hover:text-white";
+            });
+            document.getElementById('btn-dur-' + durasi).className = "dur-btn py-2.5 bg-[#1a1b26] border border-orange-500/20 border-b-2 border-b-orange-500 text-white rounded-xl font-bold text-[10px] tracking-wider transition uppercase shadow-md shadow-orange-500/5";
+            jalankanFilter();
+        }
+
+        function jalankanFilter() {
+            const keyword = document.getElementById('searchBar').value.toLowerCase();
+            const container = document.getElementById('gridLelang');
+
+            let filtered = masterLelangData;
+
+            if (filterDurasiAktif !== "ALL") {
+                filtered = filtered.filter(item => parseInt(item.durasiHari) === parseInt(filterDurasiAktif));
+            }
+
+            if (keyword) {
+                filtered = filtered.filter(item => item.namaProduk.toLowerCase().includes(keyword) || item.deskripsi.toLowerCase().includes(keyword));
+            }
+
+            if (filtered.length > 0) {
+                container.innerHTML = filtered.map(item => {
+                    const isMyProduct = String(item.uploader).toLowerCase() === String(currentUser).toLowerCase();
+                    const badgeMilik = isMyProduct 
+                        ? `<span class="text-[8px] bg-orange-500/10 text-orange-400 border border-orange-500/20 px-1.5 py-0.5 rounded-md font-black tracking-wider uppercase">Milik Anda</span>`
+                        : `<span class="text-[8px] bg-[#0f1015] text-zinc-500 border border-zinc-800 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider truncate max-w-[95px]">${item.uploader}</span>`;
+
+                    return `
+                        <div onclick="openBidModal('${item.lelangId}')" class="bg-gradient-to-br from-[#14151f] to-[#171310] border ${isMyProduct ? 'border-orange-500/20 shadow-orange-500/5' : 'border-zinc-800/60'} hover:border-orange-500/30 rounded-2xl p-4 space-y-3 cursor-pointer transition flex flex-col justify-between shadow-xl group">
+                            <div class="space-y-3">
+                                <div class="relative w-full h-36 border border-zinc-900 bg-[#0f1015] rounded-xl overflow-hidden flex items-center justify-center">
+                                    <img src="${item.foto}" class="w-full h-full object-contain">
+                                    <span class="absolute top-2 right-2 text-[8px] bg-black/80 backdrop-blur-sm border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded-md font-mono font-bold">${item.durasiHari} HARI</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-black text-white group-hover:text-orange-400 transition uppercase truncate tracking-wide">${item.namaProduk}</h3>
+                                    <div class="flex items-center justify-between mt-2 gap-2">
+                                        <span class="text-[8px] bg-[#0f1015] text-zinc-500 border border-zinc-800 font-mono px-1.5 py-0.5 rounded uppercase font-bold">Limit: ${item.tanggalSelesai.split(',')[0]}</span>
+                                        ${badgeMilik}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-zinc-900 mt-2">
+                                <div>
+                                    <span class="text-[8px] font-bold text-zinc-500 block uppercase tracking-wider">BID SEKARANG</span>
+                                    <span class="text-xs font-mono font-black text-emerald-400">Rp ${item.hargaSekarang.toLocaleString('id-ID')}</span>
+                                </div>
+                                <span class="text-[9px] bg-orange-500/10 text-orange-400 border border-orange-500/20 px-2.5 py-1 rounded-xl font-black uppercase tracking-wider group-hover:bg-orange-500/20 transition">BID</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                container.innerHTML = `<div class="col-span-full text-center p-12 bg-[#14151f]/40 border border-zinc-800/60 rounded-2xl"><p class="text-zinc-600 text-xs font-bold uppercase tracking-wider">Tidak ada data lelang aktif saat ini.</p></div>`;
+            }
+        }
+
+        function openBidModal(id) {
+            currentLelangId = id;
+            fetch('/api/lelang/detail/' + id)
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        selectedItem = res.data;
+                        document.getElementById('popNamaProduk').innerText = selectedItem.namaProduk;
+                        document.getElementById('popFoto').src = selectedItem.foto;
+                        document.getElementById('popDeskripsi').innerText = selectedItem.deskripsi;
+                        document.getElementById('popHargaSekarang').innerText = 'Rp ' + selectedItem.hargaSekarang.toLocaleString('id-ID');
+                        document.getElementById('popHargaTinggi').innerText = 'Rp ' + selectedItem.hargaTinggi.toLocaleString('id-ID');
+                        
+                        const minBidValue = selectedItem.hargaSekarang + 1000;
+                        document.getElementById('txtMinBid').innerText = 'Rp ' + minBidValue.toLocaleString('id-ID');
+                        document.getElementById('inputNominalBid').value = minBidValue;
+
+                        const listBidsDiv = document.getElementById('popListBids');
+                        if (selectedItem.bids && selectedItem.bids.length > 0) {
+                            listBidsDiv.innerHTML = selectedItem.bids.map((b, idx) => `
+                                <div class="flex justify-between text-zinc-400 py-0.5 border-b border-zinc-900/30">
+                                    <span>${idx + 1}. <span class="text-white font-bold">${b.username}</span></span>
+                                    <span class="text-emerald-400 font-bold">Rp ${b.nominal.toLocaleString('id-ID')}</span>
+                                </div>
+                            `).join('');
+                        } else {
+                            listBidsDiv.innerHTML = `<span class="text-zinc-600 text-[10px] block text-center py-2">Belum ada riwayat penawaran</span>`;
+                        }
+
+                        const btnActionContainer = document.getElementById('modalActionButtons');
+                        const bidInputWrapper = document.getElementById('bidInputWrapper');
+                        
+                        if (String(selectedItem.uploader).toLowerCase() === String(currentUser).toLowerCase()) {
+                            bidInputWrapper.style.display = 'none';
+                            btnActionContainer.innerHTML = `<div class="col-span-full text-center py-3 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-bold rounded-xl uppercase tracking-wider">Ini produk lelang yang Anda unggah</div>`;
+                        } else {
+                            bidInputWrapper.style.display = 'block';
+                            btnActionContainer.innerHTML = `
+                                <button onclick="prosesBeliInstan()" class="py-3 bg-gradient-to-tr from-orange-500 to-red-600 text-white font-black text-xs tracking-widest rounded-xl uppercase transition active:scale-95 shadow-md shadow-orange-600/10">
+                                    Beli Instan
+                                </button>
+                                <button onclick="prosesKirimBid()" class="py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs tracking-widest rounded-xl uppercase transition active:scale-95">
+                                    Kirim Bid
+                                </button>
+                            `;
+                        }
+
+                        const modal = document.getElementById("modalBid");
+                        const container = document.getElementById("bidContainer");
+                        modal.classList.remove("invisible");
+                        setTimeout(() => {
+                            container.classList.remove("scale-95", "opacity-0");
+                            container.classList.add("scale-100", "opacity-100");
+                        }, 10);
+                    }
+                });
+        }
+
+        function closeBidModal() {
+            const modal = document.getElementById("modalBid");
+            const container = document.getElementById("bidContainer");
+            container.classList.remove("scale-100", "opacity-100");
+            container.classList.add("scale-95", "opacity-0");
+            setTimeout(() => { 
+                modal.classList.add("invisible"); 
+            }, 300);
+        }
+
+        function prosesKirimBid() {
+            const nominal = parseInt(document.getElementById('inputNominalBid').value || 0);
+            if (!nominal) {
+                alert('Tentukan nominal angka bid!');
+                return;
+            }
+
+            fetch('/api/lelang/bid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lelangId: currentLelangId, nominal: nominal })
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if (res.success) {
+                    closeBidModal();
+                    muatProdukLelang();
+                }
+            })
+            .catch(() => {
+                alert('Gagal mengirim penawaran.');
+            });
+        }
+
+        function prosesBeliInstan() {
+            if (!confirm('Eksekusi beli instan sekarang menggunakan saldo akun Anda?')) return;
+            
+            fetch('/api/lelang/buynow', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lelangId: currentLelangId })
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if (res.success) {
+                    closeBidModal();
+                    window.location.href = '/dashboard';
+                }
+            })
+            .catch(() => {
+                alert('Transaksi instan gagal diproses.');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+[
+    {
+        "category": "AKUN PREMIUM",
+        "productId": "PRD-147863",
+        "productName": "YOUTUBE PREM",
+        "imageUrl": "https://i.ibb.co.com/Vc16x6M8/18141.jpg",
+        "isVariant": false,
+        "items": [
+            {
+                "subName": "YOUTUBE PREM",
+                "harga": 10000,
+                "stok": 0,
+                "deskripsi": "fadf",
+                "deskripsiExt": "tygf",
+                "email": "jwwwkkkww@gmail.ckm",
+                "pw": "nsnwkwkwk"
+            }
+        ],
+        "merchantName": "DIKA MARKET ",
+        "uploadedBy": "DIKA_NEXA",
+        "createdAt": "2026-05-17T04:39:49.736Z"
+    },
+    {
+        "category": "AKUN PREMIUM",
+        "productId": "PRD-240086",
+        "productName": "YOUTUBE PREM",
+        "imageUrl": "https://i.ibb.co.com/RGkZXTXr/18140.jpg",
+        "isVariant": true,
+        "items": [
+            {
+                "subName": "YOUTUBE PREM 1",
+                "harga": 1000,
+                "stok": 9999,
+                "deskripsi": "gada",
+                "deskripsiExt": "gada",
+                "email": "dikasipalingcihuy@gmail.com",
+                "pw": "nsnwkwkwk"
+            },
+            {
+                "subName": "YOUTUBE PREM 2",
+                "harga": 10000,
+                "stok": 9,
+                "deskripsi": "gada",
+                "deskripsiExt": "gada",
+                "email": "gmaikska@gmail.com",
+                "pw": "wkwkwkk"
+            },
+            {
+                "subName": "YOUTUBE PREM 3",
+                "harga": 100000,
+                "stok": 98,
+                "deskripsi": "gada",
+                "deskripsiExt": "gada",
+                "email": "nwkawk@gmail.com",
+                "pw": "gada"
+            }
+        ],
+        "merchantName": "DIKA MARKET ",
+        "uploadedBy": "DIKA_NEXA",
+        "createdAt": "2026-05-17T07:08:13.697Z",
+        "reviews": [
+            {
+                "username": "nexa",
+                "rating": 5,
+                "comment": "gg",
+                "date": "2026-05-17T11:33:18.245Z"
+            }
+        ],
+        "ratingDecimal": 5
+    },
+    {
+        "category": "AKUN PREMIUM",
+        "productId": "PRD-278058",
+        "productName": "ggb",
+        "imageUrl": "https://i.ibb.co.com/Txnrxc9N/18655.png",
+        "isVariant": false,
+        "items": [
+            {
+                "subName": "gg",
+                "harga": 969,
+                "stok": 65,
+                "deskripsi": "gahqh",
+                "deskripsiExt": "iwiwjjn",
+                "email": "jwwwkkkww@gmail.ckm",
+                "pw": "nsnwkwkwk",
+                "linkApk": "",
+                "urlProduk": "",
+                "a2f": "OFF",
+                "dataRahasia": "Email: jwwwkkkww@gmail.ckm | Password: nsnwkwkwk"
+            }
+        ],
+        "merchantName": "PRODUK BY OWNER",
+        "uploadedBy": "owner",
+        "createdAt": "2026-05-17T11:51:39.054Z",
+        "name": "ggb",
+        "price": 969,
+        "deskripsi": "gahqh",
+        "deskripsiExt": "iwiwjjn"
+    }
+]

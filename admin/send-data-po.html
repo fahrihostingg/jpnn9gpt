@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>kirim data produk po - admin panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015; 
+        }
+        .font-mono { 
+            font-family: 'Fira Code', monospace; 
+        }
+        ::-webkit-scrollbar { 
+            width: 0px; 
+            background: transparent; 
+        }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-2xl mx-auto space-y-6 pb-24">
+        
+        <div class="flex items-center justify-between bg-[#14151f] border border-zinc-800/80 p-5 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <a href="/admin/dashboard" class="w-9 h-9 rounded-xl bg-zinc-900/80 border border-zinc-800/60 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div>
+                    <h1 class="text-xs font-black tracking-wider text-red-500 uppercase">SEND DATA PO</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">kirim data pesanan akun / produk via email google</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-paper-plane text-red-500 text-base"></i>
+        </div>
+
+        <form id="sendDataPoForm" class="bg-[#14151f] border border-zinc-800/80 p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
+            
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-1 block">pilih antrean pembeli po :</label>
+                <div class="relative flex items-center">
+                    <i class="fa-solid fa-users absolute left-4 text-red-500/80 text-xs"></i>
+                    <select id="targetOrder" onchange="autoFillData()" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-red-500/30 rounded-xl pl-11 pr-4 py-3.5 text-xs font-bold text-white outline-none transition tracking-wider uppercase appearance-none" required>
+                        <option value="">-- memuat data pembeli... --</option>
+                    </select>
+                </div>
+            </div>
+
+            <input type="hidden" id="targetEmail" required>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-1 block">nama produk po :</label>
+                    <input type="text" id="namaProduk" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-red-500/30 rounded-xl px-4 py-3.5 text-xs font-bold text-zinc-400 outline-none transition uppercase tracking-wider" readonly required>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-1 block">id invoice po :</label>
+                    <input type="text" id="invoiceId" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-red-500/30 rounded-xl px-4 py-3.5 text-xs font-mono font-bold text-zinc-400 outline-none transition uppercase tracking-wider" readonly>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-1 block">data produk / kredensial akun :</label>
+                <textarea id="dataAkun" rows="5" placeholder="masukkan format data akun (email|pass) atau link akses produk yang akan dikirimkan ke email user..." class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-red-500/30 rounded-xl px-4 py-3.5 text-xs font-mono font-medium text-zinc-200 placeholder-zinc-700 outline-none transition tracking-wide" required></textarea>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-lg shadow-red-600/10 active:scale-[0.99] flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-paper-plane text-xs"></i> <span>proses dan kirim data via email</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        let rawOrders = [];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid || (session.user.role !== 'admin' && session.user.role !== 'owner')) {
+                        window.location.href = '/login';
+                    } else {
+                        loadPembeliPO();
+                    }
+                }).catch(() => { window.location.href = '/login'; });
+        });
+
+        function loadPembeliPO() {
+            fetch('/api/admin/list-po-orders')
+                .then(res => res.json())
+                .then(res => {
+                    const select = document.getElementById('targetOrder');
+                    if (res.success && res.data.length > 0) {
+                        rawOrders = res.data;
+                        select.innerHTML = '<option value="">-- PILIH TRANSAKSI PO PEMBELI --</option>';
+                        
+                        rawOrders.forEach((order, index) => {
+                            if (order.status !== 'Selesai') {
+                                select.innerHTML += `<option value="${index}">[${order.invoiceId}] - ${order.username} (${order.productName})</option>`;
+                            }
+                        });
+                        
+                        if(select.options.length === 1) {
+                            select.innerHTML = '<option value="">-- SEMUA PESANAN PO SUDAH SELESAI --</option>';
+                        }
+                    } else {
+                        select.innerHTML = '<option value="">-- BELUM ADA DATA PESANAN PO --</option>';
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('targetOrder').innerHTML = '<option value="">-- GAGAL MEMUAT DATA SERVER --</option>';
+                });
+        }
+
+        function autoFillData() {
+            const select = document.getElementById('targetOrder');
+            const selectedIdx = select.value;
+            
+            if (selectedIdx === "") {
+                document.getElementById('targetEmail').value = "";
+                document.getElementById('namaProduk').value = "";
+                document.getElementById('invoiceId').value = "";
+                return;
+            }
+
+            const data = rawOrders[selectedIdx];
+            document.getElementById('targetEmail').value = data.email;
+            document.getElementById('namaProduk').value = data.productName;
+            document.getElementById('invoiceId').value = data.invoiceId;
+        }
+
+        document.getElementById('sendDataPoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const targetEmail = document.getElementById('targetEmail').value;
+            const namaProduk = document.getElementById('namaProduk').value;
+            const invoiceId = document.getElementById('invoiceId').value;
+            const dataAkun = document.getElementById('dataAkun').value;
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            if(!targetEmail) return alert('Silakan pilih antrean pembeli terlebih dahulu!');
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>sedang mengirim email...</span>`;
+
+            const payloadData = {
+                targetEmail: targetEmail,
+                namaProduk: namaProduk,
+                invoiceId: invoiceId,
+                dataAkun: dataAkun
+            };
+
+            fetch('/api/admin/send-data-po', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadData)
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if(res.success) {
+                    document.getElementById('dataAkun').value = "";
+                    loadPembeliPO();
+                }
+            })
+            .catch(() => alert('gangguan koneksi internal server.'))
+            .finally(() => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane text-xs"></i> <span>proses dan kirim data via email</span>`;
+            });
+        });
+    </script>
+</body>
+</html>

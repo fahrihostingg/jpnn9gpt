@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riwayat Penarikan Saldo - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1015; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-2xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-5">
+            <div class="flex items-center gap-3">
+                <a href="/admin/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase">RIWAYAT PENARIKAN SALDO</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Audit Log & Withdrawal History</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-clock-rotate-left text-red-500 text-xl"></i>
+        </div>
+
+        <div id="loadingState" class="text-center py-16">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-500 border-t-transparent mx-auto mb-3"></div>
+            <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Memuat mutasi penarikan dana...</p>
+        </div>
+
+        <div id="emptyState" class="hidden text-center py-16 border border-dashed border-zinc-800 rounded-2xl bg-[#14151f]/40">
+            <i class="fa-solid fa-receipt text-zinc-700 text-4xl mb-2"></i>
+            <h3 class="text-xs font-black text-white uppercase tracking-wider">Tidak Ada Transaksi</h3>
+            <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5">Kamu belum pernah melakukan penarikan dana</p>
+        </div>
+
+        <div id="wdHistoryList" class="space-y-3.5"></div>
+
+    </div>
+
+    <script>
+        function formatRupiah(angka) {
+            return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+        }
+
+        async function fetchWdHistory() {
+            try {
+                const response = await fetch('/api/admin/penarikan/riwayat');
+                const result = await response.json();
+
+                document.getElementById('loadingState').classList.add('hidden');
+
+                if (result.success && result.data.length > 0) {
+                    renderHistory(result.data);
+                } else {
+                    document.getElementById('emptyState').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingState').innerHTML = `
+                    <p class="text-xs font-black text-red-500 uppercase tracking-wider">GAGAL KONEKSI KE DATA UTAMA</p>
+                `;
+            }
+        }
+
+        function renderHistory(wdRequests) {
+            const container = document.getElementById('wdHistoryList');
+            container.innerHTML = '';
+
+            // Balik urutan data agar data penarikan terbaru muncul paling atas (descending)
+            wdRequests.reverse().forEach(wd => {
+                let statusBadge = '';
+                let borderStyle = 'border-zinc-800/80';
+                
+                const statusUpper = String(wd.status).toUpperCase();
+
+                if (statusUpper === 'PENDING') {
+                    statusBadge = `<span class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1"><i class="fa-solid fa-spinner fa-spin text-[8px]"></i> PENDING</span>`;
+                    borderStyle = 'border-zinc-800';
+                } else if (statusUpper === 'SUKSES' || statusUpper === 'SUCCESS') {
+                    statusBadge = `<span class="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> SUKSES</span>`;
+                    borderStyle = 'border-emerald-500/20';
+                } else if (statusUpper === 'DITOLAK' || statusUpper === 'REJECTED') {
+                    statusBadge = `<span class="bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> DITOLAK</span>`;
+                    borderStyle = 'border-red-500/20';
+                }
+
+                const blockCard = document.createElement('div');
+                blockCard.className = `bg-[#14151f] border ${borderStyle} rounded-xl p-4 space-y-3.5 shadow-xl transition-all duration-300`;
+
+                blockCard.innerHTML = `
+                    <div class="flex items-start justify-between gap-3 border-b border-zinc-900/60 pb-3">
+                        <div>
+                            <span class="text-[9px] font-mono text-zinc-500 font-bold block">${wd.wdId}</span>
+                            <h3 class="text-sm font-black text-white tracking-wide mt-0.5">${formatRupiah(wd.nominal)}</h3>
+                        </div>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div class="bg-[#0f1015] border border-zinc-900 p-2.5 rounded-lg">
+                            <span class="text-[9px] font-black text-zinc-500 block uppercase">TUJUAN TRANFER :</span>
+                            <span class="font-bold text-zinc-300 block mt-0.5">${wd.metodePencairan.toUpperCase()} - <span class="font-mono text-white">${wd.nomorPencairan}</span></span>
+                        </div>
+                        <div class="bg-[#0f1015] border border-zinc-900 p-2.5 rounded-lg">
+                            <span class="text-[9px] font-black text-zinc-500 block uppercase">WAKTU REQUEST :</span>
+                            <span class="font-bold text-zinc-400 block mt-0.5">${wd.tanggalRequest}</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900/40 border border-zinc-800/60 px-3 py-2 rounded-lg flex items-center gap-1.5 text-[10px] font-bold text-zinc-400">
+                        <i class="fa-solid fa-comment-dots text-zinc-600 text-xs"></i>
+                        <span class="uppercase">NOTE: ${wd.keterangan || '-'}</span>
+                    </div>
+                `;
+
+                container.appendChild(blockCard);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchWdHistory);
+    </script>
+</body>
+</html>

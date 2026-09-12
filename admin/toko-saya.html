@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Toko Saya - Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-row relative select-none overflow-x-hidden">
+
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#14151f] border-r border-zinc-800/80 transform -translate-x-full lg:translate-x-0 lg:static lg:flex transition-transform duration-300 ease-in-out flex flex-col shadow-2xl shrink-0">
+        <div class="p-5 border-b border-zinc-900/60 flex justify-between items-center">
+            <div class="text-xs font-black tracking-wider text-red-500 uppercase">
+                ADMIN DASHBOARD 
+            </div>
+            <button onclick="toggleSidebarMenu()" class="text-zinc-500 hover:text-white transition lg:hidden p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 flex-grow space-y-5 overflow-y-auto">
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Navigasi Utama</div>
+                <div class="space-y-1">
+                    <a href="/admin/dashboard" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900/80 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-gauge text-red-500 w-4 text-center text-sm"></i>
+                        <span>DASHBOARD SYSTEM</span>
+                    </a>
+                    <a href="/toko-saya.html" class="w-full text-xs font-bold text-white bg-zinc-900/80 border border-red-500/30 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-shop text-red-500 w-4 text-center text-sm"></i>
+                        <span>TOKO SAYA</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Akses Menu</div>
+                <div class="space-y-1">
+                    <a href="/admin/tambah-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-plus text-red-500 w-4 text-center"></i>
+                        <span>TAMBAH PRODUK</span>
+                    </a>
+                    <a href="/admin/hapus-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-trash text-red-500 w-4 text-center"></i>
+                        <span>HAPUS PRODUK</span>
+                    </a>
+                    <a href="/admin/list-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-boxes-stacked text-red-500 w-4 text-center"></i>
+                        <span>LIST PRODUK</span>
+                    </a>
+                    <a href="/admin/edit-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-pen-to-square text-red-500 w-4 text-center"></i>
+                        <span>EDIT PRODUK</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebarOverlay" onclick="toggleSidebarMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-all duration-300 lg:hidden"></div>
+
+    <div class="flex-grow flex flex-col min-h-screen w-full min-w-0 overflow-x-hidden">
+        
+        <header class="w-full bg-[#14151f]/50 border-b border-zinc-800/80 px-4 sm:px-6 py-4 flex justify-between items-center shrink-0 sticky top-0 backdrop-blur-md z-30">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebarMenu()" class="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-95 lg:hidden">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div class="text-xs sm:text-sm text-zinc-400 font-extrabold uppercase tracking-wider">Etalase Toko Saya</div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="/admin/dashboard" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold px-3.5 py-2.5 rounded-xl border border-zinc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline">Kembali Ke Console</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-grow p-4 sm:p-6 space-y-6 w-full max-w-4xl mx-auto">
+            
+            <div class="space-y-2.5">
+                <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                    <i class="fa-solid fa-chart-simple mr-1 text-red-500"></i> RINGKASAN REPUTASI ETALASE TOKO
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-zinc-500 text-[9px] uppercase font-black tracking-wider">TOTAL PRODUK</p>
+                            <h3 id="totalProduk" class="text-xl font-black text-blue-400 tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Item Aktif</div>
+                    </div>
+
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-emerald-400 text-[9px] uppercase font-black tracking-wider flex items-center gap-1">
+                                5 <i class="fa-solid fa-star text-[8px]"></i> RATING
+                            </p>
+                            <h3 id="ratingB5" class="text-xl font-black text-white tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Sangat Puas</div>
+                    </div>
+
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-yellow-400 text-[9px] uppercase font-black tracking-wider flex items-center gap-1">
+                                4 <i class="fa-solid fa-star text-[8px]"></i> RATING
+                            </p>
+                            <h3 id="ratingB4" class="text-xl font-black text-white tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Puas</div>
+                    </div>
+
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-zinc-400 text-[9px] uppercase font-black tracking-wider flex items-center gap-1">
+                                3 <i class="fa-solid fa-star text-[8px]"></i> RATING
+                            </p>
+                            <h3 id="ratingB3" class="text-xl font-black text-white tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Biasa Saja</div>
+                    </div>
+
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-orange-400 text-[9px] uppercase font-black tracking-wider flex items-center gap-1">
+                                2 <i class="fa-solid fa-star text-[8px]"></i> RATING
+                            </p>
+                            <h3 id="ratingB2" class="text-xl font-black text-white tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Buruk</div>
+                    </div>
+
+                    <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between min-h-[105px]">
+                        <div>
+                            <p class="text-red-500 text-[9px] uppercase font-black tracking-wider flex items-center gap-1">
+                                1 <i class="fa-solid fa-star text-[8px]"></i> RATING
+                            </p>
+                            <h3 id="ratingB1" class="text-xl font-black text-white tracking-tight mt-1">0</h3>
+                        </div>
+                        <div class="text-[8px] text-zinc-600 font-bold uppercase tracking-wider mt-2">Kecewa</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 pt-2">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+                    <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                        <i class="fa-solid fa-boxes-stacked mr-1 text-red-500"></i> KATALOG INVENTORI PRODUK LIVE
+                    </div>
+                    
+                    <div id="categoryFilterBar" class="flex flex-wrap gap-1.5">
+                        <button onclick="filterKategori('ALL')" class="category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border transition bg-zinc-900 border-red-500/40 text-white">
+                            SEMUA
+                        </button>
+                        <button onclick="filterKategori('AKUN PREMIUM')" class="category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border border-zinc-800 bg-[#14151f] text-zinc-400 hover:text-white transition">
+                            AKUN PREMIUM
+                        </button>
+                        <button onclick="filterKategori('APLIKASI STREAMING')" class="category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border border-zinc-800 bg-[#14151f] text-zinc-400 hover:text-white transition">
+                            STREAMING
+                        </button>
+                        <button onclick="filterKategori('AKUN GAME')" class="category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border border-zinc-800 bg-[#14151f] text-zinc-400 hover:text-white transition">
+                            AKUN GAME
+                        </button>
+                        <button onclick="filterKategori('LAIN NYA')" class="category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border border-zinc-800 bg-[#14151f] text-zinc-400 hover:text-white transition">
+                            LAINNYA
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gridProdukSaya" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                </div>
+                
+                <div id="noProductMsg" class="hidden text-center py-12 bg-[#14151f] border border-zinc-800 rounded-2xl">
+                    <i class="fa-solid fa-box-open text-zinc-600 text-3xl mb-2 block"></i>
+                    <span class="text-xs text-zinc-500 font-bold block">Tidak ada produk dalam kategori ini</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        let currentKategoriGlobal = 'ALL';
+
+        function toggleSidebarMenu() {
+            const sidebar = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            if(sidebar && overlay) {
+                sidebar.classList.toggle("-translate-x-full");
+                overlay.classList.toggle("hidden");
+            }
+        }
+
+        function loadProductsFromJSON() {
+            const gridContainer = document.getElementById('gridProdukSaya');
+            
+            fetch('/api/admin/toko-products')
+                .then(res => res.json())
+                .then(res => {
+                    const productList = Array.isArray(res) ? res : (res.data || []);
+                    
+                    let statB5 = 0, statB4 = 0, statB3 = 0, statB2 = 0, statB1 = 0;
+
+                    if (productList.length >= 0) {
+                        gridContainer.innerHTML = ''; 
+                        
+                        productList.forEach(prod => {
+                            const firstItem = prod.items && prod.items[0] ? prod.items[0] : {};
+                            const hargaTampil = firstItem.harga || 0;
+                            
+                            let totalStok = 0;
+                            if(prod.isVariant && prod.items) {
+                                prod.items.forEach(i => totalStok += parseInt(i.stok || 0));
+                            } else {
+                                totalStok = parseInt(firstItem.stok || 0);
+                            }
+
+                            if (prod.reviews && Array.isArray(prod.reviews)) {
+                                prod.reviews.forEach(rev => {
+                                    const rVal = parseInt(rev.rating);
+                                    if (rVal === 5) statB5++;
+                                    else if (rVal === 4) statB4++;
+                                    else if (rVal === 3) statB3++;
+                                    else if (rVal === 2) statB2++;
+                                    else if (rVal === 1) statB1++;
+                                });
+                            }
+
+                            const ratDesimal = prod.ratingDecimal || '0.0';
+                            const totalReviewsCount = prod.reviews ? prod.reviews.length : 0;
+
+                            const card = document.createElement('div');
+                            card.className = "product-card bg-[#14151f] border border-zinc-800 hover:border-zinc-700/80 rounded-2xl p-3 flex flex-col justify-between transition group shadow-xl";
+                            card.setAttribute('data-category', prod.category || 'LAIN NYA');
+                            
+                            card.innerHTML = `
+                                <div class="space-y-2.5">
+                                    <div class="w-full aspect-video rounded-xl bg-zinc-950 overflow-hidden border border-zinc-900 relative">
+                                        <img src="${prod.imageUrl || 'https://via.placeholder.com/300x180/14151f/888888?text=No+Image'}" 
+                                             alt="${prod.productName}" 
+                                             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                        
+                                        <span class="absolute top-1.5 left-1.5 text-[7px] font-black bg-black/80 text-red-500 border border-zinc-800/60 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                                            ${prod.category ? prod.category.replace('AKUN ', '') : 'LAIN'}
+                                        </span>
+
+                                        <span class="absolute top-1.5 right-1.5 text-[8px] font-black bg-zinc-900/90 text-white border border-zinc-800/60 px-1.5 py-0.5 rounded-md flex items-center gap-0.5 shadow">
+                                            <i class="fa-solid fa-star text-amber-500 text-[7px]"></i>
+                                            <span>${ratDesimal}</span>
+                                            <span class="text-zinc-500 text-[7px]">(${totalReviewsCount})</span>
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="px-1">
+                                        <span class="text-[8px] font-bold text-zinc-500 uppercase tracking-widest block mb-0.5 truncate">
+                                            <i class="fa-solid fa-store text-red-500/70 mr-0.5"></i> ${prod.merchantName || 'DIKA MARKET'}
+                                        </span>
+                                        <h4 class="text-xs font-black text-white group-hover:text-red-400 transition tracking-wide line-clamp-2 uppercase">
+                                            ${prod.productName}
+                                        </h4>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-2.5 mt-3 border-t border-zinc-900/60 flex items-center justify-between px-1">
+                                    <span class="text-xs font-black text-emerald-400 font-mono">Rp ${hargaTampil.toLocaleString('id-ID')}</span>
+                                    <span class="text-[9px] font-bold ${totalStok > 0 ? 'text-zinc-400' : 'text-red-500'} bg-zinc-950 px-2 py-0.5 rounded-md border border-zinc-900">
+                                        Stok: ${totalStok}
+                                    </span>
+                                </div>
+                            `;
+                            gridContainer.appendChild(card);
+                        });
+
+                        document.getElementById('totalProduk').innerText = productList.length;
+                        document.getElementById('ratingB5').innerText = statB5;
+                        document.getElementById('ratingB4').innerText = statB4;
+                        document.getElementById('ratingB3').innerText = statB3;
+                        document.getElementById('ratingB2').innerText = statB2;
+                        document.getElementById('ratingB1').innerText = statB1;
+
+                        filterKategori(currentKategoriGlobal);
+                    }
+                })
+                .catch(e => console.log('Gagal sinkronisasi data produk JSON:', e));
+        }
+
+        function filterKategori(kategori) {
+            currentKategoriGlobal = kategori;
+            const cards = document.querySelectorAll('.product-card');
+            const btns = document.querySelectorAll('.category-btn');
+            let found = 0;
+
+            btns.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(`'${kategori}'`)) {
+                    btn.className = "category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border transition bg-zinc-900 border-red-500/40 text-white";
+                } else {
+                    btn.className = "category-btn text-[9px] font-black tracking-wider px-3 py-1.5 rounded-lg border border-zinc-800 bg-[#14151f] text-zinc-400 hover:text-white transition";
+                }
+            });
+
+            cards.forEach(card => {
+                const cardCat = card.getAttribute('data-category');
+                if (kategori === 'ALL' || cardCat === kategori) {
+                    card.style.display = 'flex';
+                    found++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const msg = document.getElementById('noProductMsg');
+            if (found === 0) msg.classList.remove('hidden');
+            else msg.classList.add('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProductsFromJSON();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riwayat Lelang Kamu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015; 
+        }
+        .font-mono { 
+            font-family: 'Fira Code', monospace; 
+        }
+        ::-webkit-scrollbar { 
+            width: 0px; 
+            background: transparent; 
+        }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-4xl mx-auto space-y-6 pb-24">
+        
+        <div class="flex items-center justify-between bg-[#14151f]/40 border border-zinc-800/60 p-5 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div>
+                    <h1 class="text-sm font-extrabold text-white tracking-widest uppercase">RIWAYAT LELANG</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Daftar Barang Yang Kamu Menangkan</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-boxes-stacked text-orange-500 text-lg"></i>
+        </div>
+
+        <div class="bg-[#14151f]/80 border border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-4 border-b border-zinc-900 bg-[#161722]/50 flex justify-between items-center px-6">
+                <h4 class="text-white font-extrabold text-xs uppercase tracking-wider">Item Menang Lelang & Buy Now</h4>
+                <span class="text-[10px] text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded uppercase tracking-wider">Data Realtime</span>
+            </div>
+            
+            <div id="historyScrollWrapper" class="max-h-[600px] overflow-y-auto">
+                <div id="listRiwayatLelang" class="p-10 text-center">
+                    <p class="text-zinc-600 text-xs font-medium uppercase tracking-wider">Memuat riwayat transaksi lelang...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(sessionData => {
+                    if (sessionData && sessionData.valid) {
+                        muatRiwayatLelang();
+                    } else {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(() => {
+                    window.location.href = '/login';
+                });
+        });
+
+        function muatRiwayatLelang() {
+            fetch('/api/lelang/history')
+                .then(res => res.json())
+                .then(res => {
+                    const container = document.getElementById('listRiwayatLelang');
+                    
+                    if (res.success && res.data && res.data.length > 0) {
+                        const listHtml = res.data.reverse().map(item => {
+                            const hargaFinal = parseInt(item.totalGrossPrice || 0);
+                            const invoiceId = item.invoiceId || '-';
+                            const namaProduk = item.productName || 'Produk Lelang';
+                            const tanggalBeli = item.date || '-';
+                            const linkAkses = item.linkAkses || '#';
+
+                            return `
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 border-b border-zinc-900/60 hover:bg-zinc-900/10 transition px-6 gap-4">
+                                    <div class="flex items-center gap-4 text-left min-w-0">
+                                        <div class="w-12 h-12 rounded-xl bg-[#0f1015] border border-zinc-800/80 shrink-0 flex items-center justify-center text-orange-500/80 bg-orange-500/5">
+                                            <i class="fa-solid fa-box-open text-lg"></i>
+                                        </div>
+                                        <div class="flex flex-col min-w-0">
+                                            <span class="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wide truncate">INV: ${invoiceId}</span>
+                                            <span class="text-xs font-black text-white uppercase tracking-wide truncate mt-0.5">${namaProduk}</span>
+                                            <span class="text-[9px] text-zinc-500 mt-1 uppercase font-bold"><i class="fa-regular fa-clock mr-1"></i>${tanggalBeli}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 gap-2">
+                                        <div class="text-left sm:text-right">
+                                            <span class="text-xs font-mono font-black text-red-400 block">-Rp ${hargaFinal.toLocaleString('id-ID')}</span>
+                                            <span class="text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest mt-1 inline-block bg-orange-500/10 text-orange-400 border border-orange-500/10">
+                                                BUY NOW
+                                            </span>
+                                        </div>
+                                        <a href="${linkAkses}" target="_blank" class="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[10px] font-bold text-white rounded-xl transition active:scale-95 flex items-center gap-1.5 uppercase tracking-wider">
+                                            <i class="fa-solid fa-up-right-from-square text-[9px] text-zinc-400"></i> Akses
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        container.className = "divide-y divide-zinc-900/40 text-left";
+                        container.innerHTML = listHtml;
+                    } else {
+                        container.className = "p-10 text-center";
+                        container.innerHTML = `<p class="text-zinc-600 text-xs font-medium uppercase tracking-wider">Belum ada riwayat memenangkan atau membeli produk lelang.</p>`;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    const container = document.getElementById('listRiwayatLelang');
+                    container.className = "p-10 text-center";
+                    container.innerHTML = `<p class="text-red-400/60 text-xs font-bold uppercase tracking-wider">Gagal memuat berkas riwayat lelang.</p>`;
+                });
+        }
+    </script>
+</body>
+</html>

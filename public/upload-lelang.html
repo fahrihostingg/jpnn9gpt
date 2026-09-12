@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Upload Produk Untuk Di Lelang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015; 
+        }
+        .font-mono { 
+            font-family: 'Fira Code', monospace; 
+        }
+        ::-webkit-scrollbar { 
+            width: 0px; 
+            background: transparent; 
+        }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-2xl mx-auto space-y-6 pb-24">
+        
+        <div class="flex items-center justify-between bg-[#14151f]/40 border border-zinc-800/60 p-5 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div>
+                    <h1 class="text-sm font-extrabold text-white tracking-widest uppercase">BUAT LELANG BARU</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Mulai Publikasikan Komoditas Lelang Anda</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-gavel text-orange-500 text-lg"></i>
+        </div>
+
+        <form id="lelangForm" class="bg-[#14151f]/40 border border-zinc-800/60 p-5 sm:p-6 rounded-2xl shadow-xl space-y-5">
+            
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">NAMA PRODUK LELANG :</label>
+                <input type="text" id="namaProduk" placeholder="CARI BARANG LELANG AKTIF..." class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl px-4 py-3 text-xs font-bold text-white placeholder-zinc-600 outline-none transition uppercase tracking-wider" required>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">DESKRIPSI LENGKAP BARANG :</label>
+                <textarea id="deskripsi" rows="3" placeholder="JELASKAN SPESIFIKASI, MINUS, ATAU KELENGKAPAN BARANG SECARA DETAIL..." class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl px-4 py-3 text-xs font-bold text-white placeholder-zinc-600 outline-none transition uppercase tracking-wider" required></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">HARGA AWAL (OPEN BID) :</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-4 text-xs font-mono font-bold text-zinc-500">Rp</span>
+                        <input type="number" id="hargaAwal" placeholder="0" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl pl-10 pr-4 py-3 text-xs font-extrabold text-white placeholder-zinc-600 outline-none transition uppercase tracking-wider" required>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">HARGA BELI INSTAN (BUY NOW) :</label>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-4 text-xs font-mono font-bold text-zinc-500">Rp</span>
+                        <input type="number" id="hargaTinggi" placeholder="0" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl pl-10 pr-4 py-3 text-xs font-extrabold text-white placeholder-zinc-600 outline-none transition uppercase tracking-wider" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">DURASI LELANG (HARI) :</label>
+                    <select id="durasiHari" class="w-full bg-[#0f1015] border border-zinc-800/80 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none tracking-wider uppercase">
+                        <option value="1">1 HARI</option>
+                        <option value="2">2 HARI</option>
+                        <option value="3">3 HARI</option>
+                        <option value="5">5 HARI</option>
+                        <option value="7">7 HARI</option>
+                    </select>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">LINK AKSES PRODUK (DIKIRIM KE PEMENANG) :</label>
+                    <input type="url" id="linkProduk" placeholder="HTTPS://ATAU-DATA-AKUN" class="w-full bg-[#0f1015] border border-zinc-800/80 focus:border-orange-500/30 rounded-xl px-4 py-3 text-xs font-bold text-white placeholder-zinc-600 outline-none transition tracking-wider" required>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-500 uppercase tracking-widest block">FOTO BARANG LELANG :</label>
+                <div class="flex items-center gap-3">
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="uploadLelangKeImgBB(this)">
+                    <button type="button" onclick="document.getElementById('fileInput').click()" class="px-5 py-3 bg-zinc-900/50 border border-zinc-800/60 hover:text-white rounded-xl font-bold text-[10px] tracking-wider text-zinc-400 transition flex items-center gap-2 uppercase active:scale-95">
+                        <i class="fa-solid fa-cloud-arrow-up text-orange-500"></i> Pilih File Gambar
+                    </button>
+                    <div id="uploadStatus" class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Belum ada file</div>
+                </div>
+                <input type="hidden" id="productImageUrl" required>
+            </div>
+
+            <div class="pt-2">
+                <button type="submit" id="btnSubmit" class="w-full py-3.5 bg-gradient-to-tr from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-md shadow-orange-600/10 active:scale-[0.99] flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-gavel"></i> <span>MULAILAH DAN TURUNKAN PASAR LELANG</span>
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid) {
+                        window.location.href = '/login';
+                    }
+                }).catch(() => { window.location.href = '/login'; });
+        });
+
+        const IMGBB_KEY = '37e84e2162972cbe655f784aff8b9218';
+
+        function uploadLelangKeImgBB(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-orange-500 mr-1"></i> PROSES HOSTING...';
+            
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    let directUrl = res.data.display_url;
+                    if (directUrl.includes('i.ibb.co/')) {
+                        directUrl = directUrl.replace('i.ibb.co/', 'i.ibb.co.com/');
+                    }
+                    document.getElementById('productImageUrl').value = directUrl;
+                    status.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> FOTO SIAP';
+                } else {
+                    status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> HOSTING GAGAL';
+                }
+            })
+            .catch(() => {
+                status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> ERROR NET';
+            });
+        }
+
+        document.getElementById('lelangForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const namaProduk = document.getElementById('namaProduk').value;
+            const deskripsi = document.getElementById('deskripsi').value;
+            const hargaAwal = parseInt(document.getElementById('hargaAwal').value || 0);
+            const hargaTinggi = parseInt(document.getElementById('hargaTinggi').value || 0);
+            const durasiHari = document.getElementById('durasiHari').value;
+            const linkProduk = document.getElementById('linkProduk').value;
+            const foto = document.getElementById('productImageUrl').value;
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            if (!foto) return alert('Silakan pasang foto barang lelang terlebih dahulu dan tunggu hingga proses hosting selesai!');
+            if (hargaTinggi <= hargaAwal) return alert('Harga beli instan (Buy Now) harus dipasang lebih tinggi daripada harga awal!');
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>MENERBITKAN LELANG...</span>`;
+
+            const payloadData = {
+                namaProduk: namaProduk,
+                deskripsi: deskripsi,
+                hargaAwal: hargaAwal,
+                hargaTinggi: hargaTinggi,
+                durasiHari: durasiHari,
+                linkProduk: linkProduk,
+                foto: foto
+            };
+
+            fetch('/api/lelang/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadData)
+            })
+            .then(res => res.json())
+            .then(res => {
+                alert(res.message);
+                if(res.success) {
+                    window.location.href = '/market-lelang'; 
+                }
+            })
+            .catch(() => alert('Gangguan koneksi internal server.'))
+            .finally(() => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-gavel"></i> <span>MULAILAH DAN TURUNKAN PASAR LELANG</span>`;
+            });
+        });
+    </script>
+</body>
+</html>

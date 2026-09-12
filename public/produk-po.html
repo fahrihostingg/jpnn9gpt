@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>daftar produk pre-order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015;
+        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between bg-[#14151f]/40 border border-zinc-800/60 p-5 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+                <div>
+                    <h1 class="text-xs font-black tracking-wider text-orange-500 uppercase">PASAR PRE-ORDER</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">pilihan produk pre-order eksklusif</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-clock text-orange-500 text-base"></i>
+        </div>
+
+        <div id="poListGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-x-4 gap-y-6 w-full">
+            <div id="loadingState" class="col-span-full text-center py-12 bg-[#14151f]/40 border border-zinc-800/60 rounded-2xl">
+                <i class="fa-solid fa-spinner fa-spin mr-2 text-orange-500"></i>
+                <span class="text-zinc-500 text-xs font-bold uppercase tracking-wider">memuat daftar produk po...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="w-full max-w-sm bg-[#14151f] border border-zinc-800 rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-emerald-500/10 border border-emerald-500 rounded-full flex items-center justify-center mx-auto text-emerald-400 text-xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wide">order berhasil</h3>
+                <p class="text-xs text-zinc-400 leading-relaxed font-semibold">
+                    silahkan cek email yang terdaftar di website ini, untuk melihat produk yang telah di kirim lewat email
+                </p>
+            </div>
+            <button onclick="closeModal()" class="w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-xs tracking-widest rounded-xl transition active:scale-95 shadow-lg shadow-orange-600/10 uppercase">
+                tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        fetch('/api/user/products-po')
+            .then(res => res.json())
+            .then(res => {
+                const grid = document.getElementById('poListGrid');
+                grid.innerHTML = '';
+
+                if (!res.success || !res.data || res.data.length === 0) {
+                    grid.innerHTML = `<div class="col-span-full text-center p-12 bg-[#14151f]/40 border border-zinc-800/60 rounded-2xl"><p class="text-zinc-600 text-xs font-bold uppercase tracking-wider">belum ada produk po tersedia</p></div>`;
+                    return;
+                }
+
+                res.data.forEach(product => {
+                    const isReady = parseInt(product.stokKuota || 0) > 0;
+                    const card = document.createElement('div');
+                    card.className = "w-full flex flex-col group cursor-pointer select-none";
+                    
+                    let badgeHtml = '';
+                    if (isReady) {
+                        badgeHtml = `
+                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/5 flex items-center gap-1.5 text-[9px] font-black text-emerald-400 uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>READY ${product.stokKuota} SLOT</span>
+                            </div>
+                        `;
+                    } else {
+                        badgeHtml = `
+                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/5 flex items-center gap-1.5 text-[9px] font-black text-zinc-500 uppercase tracking-wider">
+                                <i class="fa-solid fa-circle-xmark text-zinc-500 text-[10px]"></i>
+                                <span>HABIS</span>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div class="relative w-full aspect-square bg-gradient-to-b from-[#242530] via-[#14151f] to-[#0f1015] rounded-[2.2rem] p-7 flex items-center justify-center overflow-hidden border border-zinc-800/80 shadow-xl group-hover:border-orange-500/30 group-hover:shadow-[0_0_20px_rgba(249,115,22,0.05)] transition duration-300">
+                            <img src="${product.imageUrl || 'https://via.placeholder.com/150'}" alt="" class="w-[70%] h-[70%] object-contain rounded-2xl transition duration-500 group-hover:scale-105 ${isReady ? '' : 'opacity-30 grayscale'}">
+                            ${badgeHtml}
+                        </div>
+                        
+                        <div class="mt-3.5 px-2 space-y-1">
+                            <h2 class="text-xs sm:text-sm font-extrabold tracking-wide line-clamp-1 transition duration-300 ${isReady ? 'text-white group-hover:text-orange-500' : 'text-zinc-500 line-through'}">
+                                ${product.productName.toLowerCase()}
+                            </h2>
+                            
+                            <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">PROSES ${product.estimasiHari} HARI KERJA</p>
+                            
+                            <div class="flex items-center justify-between gap-1 pt-1">
+                                <p class="text-xs sm:text-sm font-black tracking-tight ${isReady ? 'text-orange-500' : 'text-zinc-600'}">
+                                    rp ${parseInt(product.harga).toLocaleString('id-ID')}
+                                </p>
+                                
+                                ${isReady ? `
+                                    <button onclick="orderProductPO('${product.productId}', '${product.productName.toLowerCase()}')" class="py-1.5 bg-gradient-to-r from-orange-500 to-red-600 text-white font-black text-[10px] px-3.5 rounded-xl transition duration-300 shadow-md shadow-orange-600/10 active:scale-95 uppercase tracking-wider">
+                                        order
+                                    </button>
+                                ` : `
+                                    <button class="bg-zinc-900 border border-zinc-800/60 text-zinc-600 text-[10px] font-black px-3 py-1.5 rounded-xl cursor-not-allowed uppercase tracking-wider" disabled>
+                                        habis
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            })
+            .catch(() => {
+                document.getElementById('poListGrid').innerHTML = `<div class="col-span-full text-center p-12 bg-[#14151f]/40 border border-zinc-800/60 rounded-2xl"><p class="text-red-500 text-xs font-bold uppercase tracking-wider">gagal memuat data produk</p></div>`;
+            });
+
+        function orderProductPO(id, name) {
+            if (!confirm(`apakah kamu yakin ingin po produk ${name} ini? saldo kamu akan langsung terpotong.`)) {
+                return;
+            }
+
+            if(event) {
+                const btn = event.currentTarget;
+                if(btn) btn.disabled = true;
+            }
+
+            fetch('/api/user/order-po', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: id })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    document.getElementById('successModal').classList.remove('hidden');
+                } else {
+                    alert(res.message);
+                    window.location.reload();
+                }
+            })
+            .catch(() => {
+                alert('terjadi kesalahan koneksi atau jaringan.');
+                window.location.reload();
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            window.location.reload(); 
+        }
+    </script>
+</body>
+</html>

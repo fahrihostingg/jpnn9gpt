@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Riwayat Deposit - Member Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-2xl mx-auto bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+                <a href="/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase">RIWAYAT DEPOSIT</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Log pengisian saldo akun kamu</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-credit-card text-red-500 text-xl drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]"></i>
+        </div>
+
+        <div class="bg-[#11121a] border border-zinc-900 rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-zinc-900 bg-[#161722]/50 flex justify-between items-center">
+                <h4 class="text-white font-extrabold text-xs uppercase tracking-wider">Semua Log Deposit Kamu</h4>
+                <span class="text-[10px] text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded">Mutasi</span>
+            </div>
+            
+            <div class="max-h-[450px] overflow-y-auto">
+                <div id="depositHistoryList" class="p-10 text-center">
+                    <div class="animate-spin text-red-500 text-xl mb-2"><i class="fa-solid fa-spinner"></i></div>
+                    <p class="text-zinc-600 text-xs font-medium uppercase tracking-wider">Memuat data transaksi...</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid) {
+                        window.location.href = '/login';
+                    } else {
+                        loadDepositHistory();
+                    }
+                }).catch(() => { window.location.href = '/login'; });
+        });
+
+        function loadDepositHistory() {
+            fetch('/api/deposit/history')
+                .then(res => res.json())
+                .then(res => {
+                    const container = document.getElementById('depositHistoryList');
+                    
+                    if (res.success && res.data && res.data.length > 0) {
+                        const htmlList = res.data.reverse().map(item => {
+                            const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleString('id-ID') : item.date || '-';
+                            const amount = parseInt(item.amount || item.saldo || 0).toLocaleString('id-ID');
+                            const trxId = item.trx_id || item.invoiceId || 'TRX-UNKNOWN';
+                            const method = (item.method || item.via || 'OTOMATIS').toUpperCase();
+                            
+                            let statusBadge = '';
+                            if (item.status === 'success' || item.status === 'berhasil') {
+                                statusBadge = `<span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md font-black uppercase tracking-wider border border-emerald-500/10">BERHASIL</span>`;
+                            } else if (item.status === 'pending') {
+                                statusBadge = `<span class="text-[9px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-md font-black uppercase tracking-wider border border-amber-500/10">PENDING</span>`;
+                            } else {
+                                statusBadge = `<span class="text-[9px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-500/10">GAGAL</span>`;
+                            }
+
+                            return `
+                                <div class="flex justify-between items-center p-4 border-b border-zinc-900/60 hover:bg-zinc-900/20 transition px-6">
+                                    <div class="flex flex-col text-left">
+                                        <span class="text-xs font-mono font-bold text-zinc-300">${trxId}</span>
+                                        <span class="text-[11px] text-zinc-400 font-extrabold mt-0.5 uppercase tracking-wide">VIA ${method}</span>
+                                        <span class="text-[9px] text-zinc-500 mt-0.5">${dateStr}</span>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-1.5">
+                                        <span class="text-xs font-black text-emerald-400">+Rp ${amount}</span>
+                                        ${statusBadge}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        container.className = "divide-y divide-zinc-900/40 text-left";
+                        container.innerHTML = htmlList;
+                    } else {
+                        container.className = "p-10 text-center";
+                        container.innerHTML = `<p class="text-zinc-600 text-xs font-medium uppercase tracking-wider">Belum ada riwayat pengisian saldo / deposit.</p>`;
+                    }
+                })
+                .catch(() => {
+                    const container = document.getElementById('depositHistoryList');
+                    container.className = "p-10 text-center";
+                    container.innerHTML = `<p class="text-red-500 text-xs font-bold uppercase tracking-wider">Gagal memuat riwayat data dari server.</p>`;
+                });
+        }
+    </script>
+</body>
+</html>

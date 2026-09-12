@@ -1,0 +1,47 @@
+[
+    {
+        "username": "DIKA_NEXA",
+        "password": "dika99",
+        "email": "dikasipalingcihuy@gmail.com",
+        "nomorHp": "083121495921",
+        "apiKey": "apky-s4m6m",
+        "role": "admin",
+        "saldo": 0
+    },
+    {
+        "username": "owner",
+        "password": "123",
+        "email": "owner@gmail.com",
+        "nomorHp": "",
+        "apiKey": "apky-owner123",
+        "role": "owner"
+    },
+    {
+        "username": "nexa",
+        "password": "nexa",
+        "email": "nexa@gmail.con",
+        "nomorHp": "0899999999",
+        "apiKey": "apky -666cf",
+        "role": "user",
+        "saldo": 990000
+    },
+    {
+        "username": "NEXA1",
+        "password": "n",
+        "email": "dikabjir8@gmail.com",
+        "nomorHp": "089999999",
+        "apiKey": "apky-6ecmy",
+        "role": "user",
+        "saldo": 9000
+    },
+    {
+        "username": "dika_nexa-1",
+        "password": "nexa",
+        "email": "akunmontonnn8@gmail.com",
+        "nomorHp": "0899999994",
+        "apiKey": "apky-55dnw",
+        "role": "user",
+        "saldo": 1000000,
+        "createdAt": "2026-05-18T09:24:48.507Z"
+    }
+]

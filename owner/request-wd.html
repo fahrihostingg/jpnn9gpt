@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kelola Penarikan - Owner Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1015; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between bg-[#14151f] border border-zinc-800 rounded-2xl p-5 shadow-2xl">
+            <div class="flex items-center gap-3">
+                <a href="/owner/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill-transfer text-red-500"></i>
+                        Persetujuan WD Admin
+                    </h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Owner Verification Request Console</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-2">
+                <button onclick="fetchWdRequests()" class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition active:scale-95">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-xl">
+                <span class="text-[9px] font-black text-zinc-500 block uppercase">Total Permintaan</span>
+                <span id="countTotal" class="text-xl font-black text-white block mt-1">0</span>
+            </div>
+            <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-xl">
+                <span class="text-[9px] font-black text-zinc-400 block uppercase text-amber-500">Menunggu (Pending)</span>
+                <span id="countPending" class="text-xl font-black text-amber-500 block mt-1">0</span>
+            </div>
+            <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-xl">
+                <span class="text-[9px] font-black text-zinc-400 block uppercase text-emerald-400">Diterima (Sukses)</span>
+                <span id="countSuccess" class="text-xl font-black text-emerald-400 block mt-1">0</span>
+            </div>
+            <div class="bg-[#14151f] border border-zinc-800 p-4 rounded-xl">
+                <span class="text-[9px] font-black text-zinc-400 block uppercase text-red-500">Ditolak (Gagal)</span>
+                <span id="countRejected" class="text-xl font-black text-red-500 block mt-1">0</span>
+            </div>
+        </div>
+
+        <div id="loadingState" class="py-20 text-center bg-[#14151f] border border-zinc-800 rounded-2xl">
+            <div class="w-8 h-8 border-4 border-t-red-500 border-zinc-800 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">Memuat permintaan penarikan dana...</p>
+        </div>
+
+        <div id="emptyState" class="hidden bg-[#14151f]/50 border border-zinc-800 p-12 rounded-2xl text-center">
+            <i class="fa-solid fa-circle-check text-4xl text-zinc-700 mb-3"></i>
+            <p class="text-zinc-500 text-xs font-bold uppercase tracking-wider">Bersih! Tidak ada permintaan penarikan pending saat ini.</p>
+        </div>
+
+        <div id="wdListContainer" class="space-y-4 hidden flex flex-col w-full"></div>
+
+    </div>
+
+    <script>
+        let allRequests = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchWdRequests();
+        });
+
+        function fetchWdRequests() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('wdListContainer').classList.add('hidden');
+            document.getElementById('emptyState').classList.add('hidden');
+
+            fetch('/api/owner/penarikan/list')
+                .then(res => res.json())
+                .then(res => {
+                    document.getElementById('loadingState').classList.add('hidden');
+                    if (res.success && res.data) {
+                        allRequests = res.data;
+                        updateCounters(allRequests);
+                        
+                        if (allRequests.length > 0) {
+                            renderRequests(allRequests);
+                        } else {
+                            document.getElementById('emptyState').classList.remove('hidden');
+                        }
+                    } else {
+                        document.getElementById('emptyState').classList.remove('hidden');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('loadingState').classList.add('hidden');
+                    document.getElementById('emptyState').classList.remove('hidden');
+                });
+        }
+
+        function updateCounters(data) {
+            document.getElementById('countTotal').innerText = data.length;
+            document.getElementById('countPending').innerText = data.filter(x => String(x.status).toUpperCase() === 'PENDING' || !x.status).length;
+            document.getElementById('countSuccess').innerText = data.filter(x => String(x.status).toUpperCase() === 'SUCCESS' || String(x.status).toUpperCase() === 'SUKSES').length;
+            document.getElementById('countRejected').innerText = data.filter(x => String(x.status).toUpperCase() === 'REJECTED' || String(x.status).toUpperCase() === 'GAGAL' || String(x.status).toUpperCase() === 'DITOLAK').length;
+        }
+
+        function renderRequests(requests) {
+            const container = document.getElementById('wdListContainer');
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            container.innerHTML = requests.slice().reverse().map(item => {
+                const dateStr = item.tanggalRequest || item.timestamp || '-';
+                const status = (item.status || 'PENDING').toUpperCase();
+                
+                let statusBadge = '';
+                let actionButtons = '';
+
+                if (status === 'PENDING') {
+                    statusBadge = `<span class="text-[9px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded border border-amber-500/10 font-black tracking-wider uppercase">PENDING</span>`;
+                    actionButtons = `
+                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-900/60 w-full">
+                            <button onclick="processWd('${item.wdId}', 'reject')" class="py-2.5 bg-zinc-900 hover:bg-red-950/40 border border-zinc-800 text-red-500 hover:text-red-400 text-[10px] font-black tracking-widest rounded-xl transition uppercase">
+                                <i class="fa-solid fa-xmark mr-1"></i> Tolak
+                            </button>
+                            <button onclick="processWd('${item.wdId}', 'approve')" class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black tracking-widest rounded-xl transition uppercase shadow-xl shadow-emerald-600/10">
+                                <i class="fa-solid fa-check mr-1"></i> Terima & TF
+                            </button>
+                        </div>
+                    `;
+                } else if (status === 'SUCCESS' || status === 'SUKSES') {
+                    statusBadge = `<span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/10 font-black tracking-wider uppercase">SUKSES (CAIR)</span>`;
+                } else {
+                    statusBadge = `<span class="text-[9px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/10 font-black tracking-wider uppercase">DITOLAK</span>`;
+                }
+
+                return `
+                    <div class="bg-[#14151f] border border-zinc-800/80 rounded-2xl shadow-xl p-5 space-y-4 w-full text-left">
+                        <div class="flex justify-between items-center border-b border-zinc-900/60 pb-3 w-full">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-mono font-bold text-zinc-400 block">${item.wdId || 'WD-TRX'}</span>
+                                <span class="text-[9px] text-zinc-500 mt-0.5 block">${dateStr}</span>
+                            </div>
+                            ${statusBadge}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full py-1">
+                            <div class="space-y-1">
+                                <span class="text-zinc-500 text-[9px] font-bold uppercase block">Admin / Pemohon :</span>
+                                <div class="text-sm font-black text-white uppercase"><i class="fa-solid fa-user text-xs text-zinc-600 mr-1.5"></i>${item.username || 'UNKNOWN'}</div>
+                            </div>
+                            <div class="space-y-0.5 sm:text-right">
+                                <span class="text-zinc-500 text-[9px] font-bold uppercase block">Nominal Pencairan :</span>
+                                <span class="text-lg font-black text-red-500 block">Rp ${parseInt(item.nominal || 0).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0f1015] border border-zinc-900 p-3 rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono">
+                            <div>
+                                <span class="text-zinc-500 text-[9px] font-sans font-bold block uppercase">Metode Transfer :</span>
+                                <span class="text-blue-400 font-bold font-sans text-[10px] bg-blue-500/5 px-1.5 py-0.5 rounded border border-blue-500/10 uppercase inline-block mt-0.5">${item.metodePencairan || '-'}</span>
+                            </div>
+                            <div class="sm:text-right">
+                                <span class="text-zinc-500 text-[9px] font-sans font-bold block uppercase">Nomor Rekening / Tujuan :</span>
+                                <span class="text-white font-bold select-all block mt-0.5">${item.nomorPencairan || '-'}</span>
+                            </div>
+                        </div>
+
+                        ${actionButtons}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function processWd(wdId, action) {
+            const confirmation = confirm(`Apakah Anda yakin ingin melakukan tindakan ini untuk ID ${wdId}?`);
+            if (!confirmation) return;
+
+            fetch('/api/owner/penarikan/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ wdId: wdId, action: action })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert('Sukses memproses permintaan WD!');
+                    fetchWdRequests();
+                } else {
+                    alert('Gagal memproses: ' + res.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan.');
+            });
+        }
+    </script>
+</body>
+</html>

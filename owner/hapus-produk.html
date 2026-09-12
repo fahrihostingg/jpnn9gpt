@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hapus Produk - Owner Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-col items-center justify-center select-none p-4">
+
+    <div class="w-full max-w-md bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-6 text-center space-y-6">
+        
+        <div class="w-16 h-16 bg-red-600/10 border border-red-500 rounded-full flex items-center justify-center mx-auto text-red-500 text-2xl drop-shadow-[0_0_10px_rgba(239,68,68,0.2)]">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div class="space-y-2">
+            <h1 class="text-base font-black text-white tracking-wide uppercase">KONFIRMASI HAPUS PRODUK</h1>
+            <p class="text-xs text-zinc-400 font-medium">Apakah kamu yakin ingin menghapus produk master ini secara permanen dari database?</p>
+        </div>
+
+        <div id="productBox" class="bg-zinc-900/60 border border-zinc-800/80 rounded-xl p-4 flex items-center gap-3 text-left hidden">
+            <img id="productImage" src="" class="w-12 h-12 rounded-lg object-cover border border-zinc-800 bg-[#11121a]">
+            <div class="min-w-0 flex-grow">
+                <span id="displayId" class="text-[9px] bg-zinc-900 border border-zinc-800 text-red-400 px-2 py-0.5 rounded font-mono font-bold tracking-wide">ID</span>
+                <h3 id="productName" class="text-xs font-black text-white uppercase tracking-wide truncate mt-1">NAMA PRODUK</h3>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <a href="/owner/list-produk.html" class="w-1/2 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold rounded-xl text-xs transition uppercase tracking-wider">
+                Batal
+            </a>
+            <button id="btnConfirmDelete" onclick="executeDelete()" class="w-1/2 py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs transition uppercase tracking-wider shadow-lg shadow-red-600/10">
+                Ya, Hapus
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetProductId = urlParams.get('id');
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid || session.user.role !== 'owner') {
+                        window.location.href = '/login';
+                    } else if (!targetProductId) {
+                        window.location.href = '/owner/list-produk.html';
+                    } else {
+                        getDetailToDelete();
+                    }
+                }).catch(() => { window.location.href = '/login'; });
+        });
+
+        function getDetailToDelete() {
+            fetch('/api/products')
+                .then(res => res.json())
+                .then(response => {
+                    if (response.success && response.data) {
+                        const product = response.data.find(p => (String(p.productId) === String(targetProductId) || String(p.id) === String(targetProductId)));
+                        if (product) {
+                            document.getElementById('productImage').src = product.imageUrl || product.image || 'https://placehold.co/100x100/11121a/white?text=PRODUK';
+                            document.getElementById('displayId').innerText = product.productId || product.id;
+                            document.getElementById('productName').innerText = product.productName;
+                            document.getElementById('productBox').classList.remove('hidden');
+                        } else {
+                            window.location.href = '/owner/list-produk.html';
+                        }
+                    }
+                });
+        }
+
+        function executeDelete() {
+            const btn = document.getElementById('btnConfirmDelete');
+            btn.disabled = true;
+            btn.innerText = "MENGHAPUS...";
+
+            fetch(`/api/owner/product/delete/${targetProductId}`, {
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert('Produk berhasil dihapus secara permanen.');
+                    window.location.href = '/owner/list-produk.html';
+                } else {
+                    alert('Gagal menghapus: ' + res.message);
+                    btn.disabled = false;
+                    btn.innerText = "Ya, Hapus";
+                }
+            })
+            .catch(() => {
+                alert('Terjadi kesalahan jaringan.');
+                btn.disabled = false;
+                btn.innerText = "Ya, Hapus";
+            });
+        }
+    </script>
+</body>
+</html>

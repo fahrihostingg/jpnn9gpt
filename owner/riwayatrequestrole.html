@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Owner - Riwayat Request Role</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex items-center justify-center p-4 sm:p-6 select-none overflow-x-hidden">
+
+    <div class="w-full max-w-2xl flex flex-col gap-4">
+        
+        <div class="flex justify-between items-center px-2">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                <span class="text-[10px] text-zinc-500 font-extrabold tracking-widest uppercase font-mono">Console History System</span>
+            </div>
+            <a href="/owner/dashboard" class="text-[10px] bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 font-black px-3 py-1.5 rounded-xl border border-zinc-800 transition flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-arrow-left text-[9px]"></i>
+                <span>KEMBALI KEDASHBOARD</span>
+            </a>
+        </div>
+
+        <div class="bg-[#14151f] border border-zinc-800/80 p-6 rounded-2xl shadow-2xl space-y-5 w-full relative overflow-hidden">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-900 pb-4 gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-[#0f1015] flex items-center justify-center border border-zinc-800/80 text-red-500 shadow-inner">
+                        <i class="fa-solid fa-clock-rotate-left text-xs"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-black text-xs uppercase tracking-wider">Riwayat Request Role</h4>
+                        <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-tight mt-0.5">Log Keputusan Owner</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-1.5 bg-[#0f1015] p-1 rounded-xl border border-zinc-800/60 self-start sm:self-center">
+                    <button onclick="filterStatus('ALL')" id="btnAll" class="text-[9px] font-black px-2.5 py-1.5 rounded-lg bg-zinc-900 text-white border border-zinc-800 transition uppercase tracking-wider">Semua</button>
+                    <button onclick="filterStatus('SUCCESS')" id="btnSuccess" class="text-[9px] font-black px-2.5 py-1.5 rounded-lg text-zinc-500 hover:text-emerald-400 transition uppercase tracking-wider">Disetujui</button>
+                    <button onclick="filterStatus('REJECTED')" id="btnRejected" class="text-[9px] font-black px-2.5 py-1.5 rounded-lg text-zinc-500 hover:text-red-400 transition uppercase tracking-wider">Ditolak</button>
+                </div>
+            </div>
+
+            <div id="loadingState" class="py-16 text-center space-y-2.5">
+                <i class="fa-solid fa-circle-notch animate-spin text-red-500 text-xl"></i>
+                <p class="text-zinc-500 text-[10px] font-black uppercase tracking-widest font-mono">Memuat log histori pengajuan...</p>
+            </div>
+
+            <div id="emptyState" class="hidden py-16 text-center space-y-3">
+                <div class="w-12 h-12 rounded-full bg-zinc-900/50 border border-zinc-800/60 flex items-center justify-center mx-auto text-zinc-600">
+                    <i class="fa-solid fa-folder-open text-lg"></i>
+                </div>
+                <p class="text-zinc-500 text-[10px] font-black uppercase tracking-widest font-mono">Tidak ada data riwayat ditemukan</p>
+            </div>
+
+            <div id="listHistory" class="hidden space-y-3 max-h-[440px] overflow-y-auto pr-1"></div>
+        </div>
+        
+    </div>
+
+    <script>
+        let allData = [];
+        let currentFilter = 'ALL';
+
+        function loadHistory() {
+            const loadingState = document.getElementById('loadingState');
+            const emptyState = document.getElementById('emptyState');
+            const listHistory = document.getElementById('listHistory');
+
+            loadingState.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            listHistory.classList.add('hidden');
+
+            fetch('/api/owner/request-role/list')
+                .then(res => res.json())
+                .then(res => {
+                    loadingState.classList.add('hidden');
+                    if (res.success && res.data && res.data.length > 0) {
+                        allData = res.data.filter(r => {
+                            const stat = (r.status || '').toUpperCase();
+                            return stat === 'SUCCESS' || stat === 'REJECTED';
+                        });
+                        renderData();
+                    } else {
+                        emptyState.classList.remove('hidden');
+                    }
+                })
+                .catch(() => {
+                    loadingState.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                });
+        }
+
+        function renderData() {
+            const emptyState = document.getElementById('emptyState');
+            const listHistory = document.getElementById('listHistory');
+            
+            const filtered = allData.filter(item => {
+                if (currentFilter === 'ALL') return true;
+                return (item.status || '').toUpperCase() === currentFilter;
+            });
+
+            if (filtered.length === 0) {
+                listHistory.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            listHistory.classList.remove('hidden');
+
+            listHistory.innerHTML = filtered.map(req => {
+                const isSuccess = (req.status || '').toUpperCase() === 'SUCCESS';
+                const statusBadge = isSuccess 
+                    ? `<span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-black tracking-widest uppercase font-mono">DISETUJUI</span>`
+                    : `<span class="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded font-black tracking-widest uppercase font-mono">DITOLAK</span>`;
+                
+                return `
+                    <div class="bg-[#0f1015] border border-zinc-800/50 p-4 rounded-xl flex flex-col gap-2.5 hover:border-zinc-800 transition duration-300">
+                        <div class="flex justify-between items-start">
+                            <div class="flex flex-col text-left">
+                                <span class="text-white font-black text-xs uppercase tracking-wide">USER: ${req.username}</span>
+                                <span class="text-[10px] font-extrabold mt-0.5 uppercase text-zinc-400 font-mono tracking-wider">ROLE: ${req.roleRequested || 'ADMIN'}</span>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="bg-[#14151f] border border-zinc-900/80 px-3 py-2 rounded-lg text-left shadow-inner">
+                            <p class="text-[10px] text-zinc-500 font-bold uppercase text-[9px] tracking-tight mb-1">Alasan Pengajuan:</p>
+                            <p class="text-[10px] text-zinc-400 font-medium leading-relaxed break-words select-text">${req.alasan || '-'}</p>
+                        </div>
+                        <div class="flex justify-end text-[9px] text-zinc-600 font-bold font-mono tracking-tight">
+                            Diproses: ${req.date || '-'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterStatus(status) {
+            currentFilter = status;
+            
+            const btns = {
+                ALL: document.getElementById('btnAll'),
+                SUCCESS: document.getElementById('btnSuccess'),
+                REJECTED: document.getElementById('btnRejected')
+            };
+
+            Object.keys(btns).forEach(key => {
+                if (key === status) {
+                    btns[key].className = "text-[9px] font-black px-2.5 py-1.5 rounded-lg bg-zinc-900 text-white border border-zinc-800 transition uppercase tracking-wider";
+                } else {
+                    let hoverColor = key === 'SUCCESS' ? 'hover:text-emerald-400' : key === 'REJECTED' ? 'hover:text-red-400' : 'hover:text-white';
+                    btns[key].className = `text-[9px] font-black px-2.5 py-1.5 rounded-lg text-zinc-500 ${hoverColor} transition uppercase tracking-wider`;
+                }
+            });
+
+            renderData();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(session => {
+                    if (!session.valid || session.user.role !== 'owner') {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    loadHistory();
+                })
+                .catch(() => {
+                    window.location.href = '/login';
+                });
+        });
+    </script>
+</body>
+</html>

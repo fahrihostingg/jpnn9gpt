@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Detail Produk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #0f1015;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="text-zinc-200 min-h-screen w-full pb-24 select-none">
+
+    <header class="w-full bg-[#14151f]/80 border-b border-zinc-800/80 px-4 py-4 flex items-center justify-between sticky top-0 backdrop-blur-md z-40">
+        <div class="flex items-center space-x-3">
+            <a href="javascript:history.back()" class="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-95">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-sm font-black tracking-wider text-white uppercase">DETAIL PRODUK</h1>
+                <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wide">Informasi Item & Transaksi</p>
+            </div>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-red-500">
+            <i class="fa-solid fa-circle-info text-sm"></i>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl mx-auto p-4 space-y-4">
+        
+        <div id="loadingState" class="flex flex-col items-center justify-center py-32">
+            <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-500 border-t-transparent mb-3"></div>
+            <p class="text-xs font-bold text-zinc-500 tracking-wider uppercase">Mengambil data item...</p>
+        </div>
+
+        <div id="mainContent" class="hidden space-y-4">
+            
+            <div class="w-full aspect-video bg-[#14151f] border border-zinc-800/80 rounded-2xl overflow-hidden shadow-2xl relative">
+                <img id="prodImage" src="" alt="" class="w-full h-full object-cover">
+                <div id="prodCategory" class="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-zinc-800 text-[10px] font-black tracking-wider text-red-500 uppercase">
+                    -
+                </div>
+            </div>
+
+            <div class="bg-[#14151f] border border-zinc-800/80 rounded-2xl p-4 space-y-3 shadow-xl">
+                
+                <div class="flex items-center gap-1.5 text-[10px] font-extrabold text-zinc-400 bg-zinc-900/60 border border-zinc-800/50 px-2.5 py-1 rounded-lg w-fit uppercase tracking-wider">
+                    <i class="fa-solid fa-store text-red-500"></i>
+                    <span id="prodMerchant" class="text-zinc-300">-</span>
+                    <i class="fa-solid fa-circle-check text-sky-400 text-[11px] ml-0.5"></i>
+                </div>
+
+                <h2 id="prodName" class="text-base font-black text-white uppercase tracking-wide leading-tight">-</h2>
+
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-900/80">
+                    <div>
+                        <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-wider">Harga Item</p>
+                        <p id="prodPrice" class="text-lg font-black text-red-500">Rp 0</p>
+                    </div>
+                    <div class="text-right flex flex-col items-end justify-center">
+                        <p class="text-[9px] text-zinc-500 uppercase font-bold tracking-wider mb-0.5">Ketersediaan</p>
+                        <span id="prodStockBadge" class="inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-md font-black uppercase tracking-wider">
+                            <span id="prodStockDot" class="w-1 h-1 rounded-full"></span>
+                            <span id="prodStockText">STOK: 0</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#14151f] border border-zinc-800/80 rounded-2xl p-4 space-y-3 shadow-xl">
+                <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-file-lines text-red-500"></i> RINCIAN DESKRIPSI PER VARIANT :
+                </h3>
+                <div class="h-px bg-zinc-900"></div>
+                
+                <div id="variantDescriptionsContainer" class="space-y-2 max-h-[400px] overflow-y-auto pr-0.5">
+                    </div>
+            </div>
+
+            <div class="bg-[#14151f] border border-zinc-800/80 rounded-2xl p-4 space-y-3 shadow-xl">
+                <div class="flex justify-between items-center border-b border-zinc-900 pb-2.5">
+                    <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-red-500"></i> ULASAN & TESTIMONI :
+                    </h3>
+                    <div class="flex items-center gap-1 bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 rounded-lg">
+                        <i class="fa-solid fa-star text-red-500 text-[10px]"></i>
+                        <span id="averageRatingText" class="text-[10px] font-black text-white">0.0</span>
+                    </div>
+                </div>
+                
+                <div id="reviewsListContainer" class="space-y-3 max-h-80 overflow-y-auto pr-0.5">
+                    </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="bottomBar" class="hidden fixed bottom-0 left-0 w-full bg-[#14151f]/90 border-t border-zinc-800/80 p-4 backdrop-blur-md z-40 flex justify-center">
+        <button onclick="openVariantModal()" class="w-full max-w-2xl py-3.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-lg shadow-red-600/10 active:scale-[0.98]">
+            <i class="fa-solid fa-cart-shopping mr-1.5"></i> BELI SEKARANG
+        </button>
+    </div>
+
+    <div id="variantModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end justify-center transition-all duration-300">
+        <div class="absolute inset-0" onclick="closeVariantModal()"></div>
+        
+        <div class="bg-[#14151f] border-t border-zinc-800 w-full max-w-2xl rounded-t-3xl p-5 space-y-5 relative z-10 transform translate-y-0 transition-transform duration-300">
+            
+            <button onclick="closeVariantModal()" class="absolute top-4 right-4 w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-white rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-xs"></i>
+            </button>
+
+            <div class="flex gap-4 border-b border-zinc-800 pb-4">
+                <div class="w-20 h-20 bg-[#0f1015] border border-zinc-800 rounded-xl overflow-hidden shrink-0">
+                    <img id="modalImage" src="" class="w-full h-full object-cover">
+                </div>
+                <div class="flex flex-col justify-end space-y-1">
+                    <p id="modalPrice" class="text-base font-black text-red-500">Rp 0</p>
+                    <p id="modalStock" class="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">STOK: 0</p>
+                    <p id="modalSelectedVariant" class="text-[10px] font-black text-zinc-300 bg-zinc-900/80 px-2 py-0.5 border border-zinc-800 rounded rounded-md w-fit uppercase tracking-wide">PILIH VARIANT DIBAWAH</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">PILIH VARIANT / OPSI :</label>
+                <div id="variantOptionsContainer" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-b border-zinc-900 py-3.5">
+                <div>
+                    <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">JUMLAH BELI :</label>
+                    <span class="text-[9px] font-bold text-zinc-600 uppercase tracking-wide">Maksimal 10 unit</span>
+                </div>
+                <div class="flex items-center bg-[#0f1015] border border-zinc-800 rounded-xl overflow-hidden p-1">
+                    <button onclick="updateQty(-1)" class="w-8 h-8 rounded-lg bg-zinc-900/50 border border-zinc-800/80 text-zinc-400 font-bold hover:text-white transition active:scale-95">-</button>
+                    <span id="qtyDisplay" class="w-10 text-center font-mono font-black text-xs text-white">1</span>
+                    <button onclick="updateQty(1)" class="w-8 h-8 rounded-lg bg-zinc-900/50 border border-zinc-800/80 text-zinc-400 font-bold hover:text-white transition active:scale-95">+</button>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex items-center justify-between bg-zinc-900/40 border border-zinc-800/60 p-3 rounded-xl text-[10px] font-bold tracking-wide uppercase text-zinc-500">
+                    <div>Potongan Admin (Fee 10%):</div>
+                    <div id="displayFee" class="font-mono text-red-400 font-black">Rp 0</div>
+                </div>
+                <button onclick="executePurchase()" class="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-xl shadow-red-600/10 flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> KONFIRMASI PEMBELIAN
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let productData = null;
+        let selectedItemIndex = null;
+        let buyQty = 1;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlProductId = urlParams.get('id');
+
+        async function loadProductDetail() {
+            if(!urlProductId) {
+                alert('ID Produk tidak valid!');
+                window.location.href = 'listproduk.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/products');
+                const result = await response.json();
+
+                if (result.success && result.data.length > 0) {
+                    productData = result.data.find(p => String(p.productId) === String(urlProductId) || String(p.id) === String(urlProductId));
+
+                    if(!productData) {
+                        alert('Produk tidak ditemukan di database JSON!');
+                        window.location.href = 'listproduk.html';
+                        return;
+                    }
+
+                    renderDetailView();
+                } else {
+                    alert('Gagal mengambil data dari server database.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan koneksi sistem API.');
+            }
+        }
+
+        function renderDetailView() {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            document.getElementById('bottomBar').classList.remove('hidden');
+
+            let totalStok = 0;
+            let hargaList = [];
+            
+            productData.items.forEach(item => {
+                totalStok += parseInt(item.stok || 0);
+                hargaList.push(parseInt(item.harga || 0));
+            });
+
+            const minHarga = Math.min(...hargaList);
+            const maxHarga = Math.max(...hargaList);
+
+            document.getElementById('prodImage').src = productData.imageUrl;
+            document.getElementById('modalImage').src = productData.imageUrl;
+            document.getElementById('prodCategory').innerText = productData.category;
+            document.getElementById('prodMerchant').innerText = productData.merchantName;
+            document.getElementById('prodName').innerText = productData.productName;
+            
+            if(productData.isVariant && minHarga !== maxHarga) {
+                document.getElementById('prodPrice').innerText = `Rp ${minHarga.toLocaleString('id-ID')} - Rp ${maxHarga.toLocaleString('id-ID')}`;
+                document.getElementById('modalPrice').innerText = `Rp ${minHarga.toLocaleString('id-ID')} - Rp ${maxHarga.toLocaleString('id-ID')}`;
+            } else {
+                document.getElementById('prodPrice').innerText = `Rp ${minHarga.toLocaleString('id-ID')}`;
+                document.getElementById('modalPrice').innerText = `Rp ${minHarga.toLocaleString('id-ID')}`;
+            }
+
+            const stockBadge = document.getElementById('prodStockBadge');
+            const stockDot = document.getElementById('prodStockDot');
+            const stockText = document.getElementById('prodStockText');
+
+            stockText.innerText = totalStok > 0 ? `TOTAL STOK: ${totalStok}` : 'STOK HABIS';
+            if(totalStok > 0) {
+                stockBadge.className = "inline-flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/10 px-2 py-0.5 rounded-md font-black uppercase tracking-wider";
+                stockDot.className = "w-1 h-1 rounded-full bg-emerald-400";
+            } else {
+                stockBadge.className = "inline-flex items-center gap-1 text-[9px] text-red-400 bg-red-500/10 border border-red-500/10 px-2 py-0.5 rounded-md font-black uppercase tracking-wider";
+                stockDot.className = "w-1 h-1 rounded-full bg-red-400";
+            }
+            document.getElementById('modalStock').innerText = `STOK: ${totalStok}`;
+
+            buildVariantDescriptions();
+            buildReviewsList();
+            buildVariantButtons();
+        }
+
+        function buildVariantDescriptions() {
+            const container = document.getElementById('variantDescriptionsContainer');
+            container.innerHTML = '';
+
+            productData.items.forEach((item, index) => {
+                const isFirstOpen = index === 0 ? '' : 'hidden';
+                const isIconRotated = index === 0 ? 'rotate-180' : '';
+
+                container.innerHTML += `
+                    <div class="border border-zinc-900 bg-zinc-900/20 rounded-xl overflow-hidden transition-all duration-200">
+                        <button onclick="toggleDescriptionAccordion(${index})" type="button" class="w-full flex justify-between items-center p-3 text-left hover:bg-zinc-800/30 transition outline-none">
+                            <span class="text-xs font-extrabold text-zinc-300 uppercase tracking-wide flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                Varian: ${item.subName}
+                            </span>
+                            <i id="acc-icon-${index}" class="fa-solid fa-chevron-down text-[10px] text-zinc-500 transition-transform duration-200 ${isIconRotated}"></i>
+                        </button>
+                        <div id="acc-content-${index}" class="${isFirstOpen} p-3 border-t border-zinc-900 bg-[#0f1015]/60 space-y-2.5">
+                            <div>
+                                <span class="text-[9px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">Rincian Deskripsi :</span>
+                                <p class="text-xs font-semibold text-zinc-400 leading-relaxed whitespace-pre-line">${item.deskripsi || 'Tidak ada deskripsi utama.'}</p>
+                            </div>
+                            ${item.deskripsiExt ? `
+                            <div class="pt-2 border-t border-zinc-900/60">
+                                <span class="text-[9px] font-bold text-red-400 uppercase tracking-wider block mb-0.5"><i class="fa-solid fa-circle-exclamation mr-1"></i>Catatan / Instruksi Tambahan :</span>
+                                <p class="text-xs font-semibold text-zinc-400 leading-relaxed whitespace-pre-line">${item.deskripsiExt}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleDescriptionAccordion(index) {
+            const content = document.getElementById(`acc-content-${index}`);
+            const icon = document.getElementById(`acc-icon-${index}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        function buildReviewsList() {
+            document.getElementById('averageRatingText').innerText = productData.ratingDecimal || '0.0';
+            const container = document.getElementById('reviewsListContainer');
+            container.innerHTML = '';
+
+            if (productData.reviews && productData.reviews.length > 0) {
+                productData.reviews.reverse().forEach(rev => {
+                    let starsHtml = '';
+                    for (let i = 1; i <= 5; i++) {
+                        if (i <= rev.rating) {
+                            starsHtml += '<i class="fa-solid fa-star text-amber-500 text-[9px]"></i>';
+                        } else {
+                            starsHtml += '<i class="fa-solid fa-star text-zinc-700 text-[9px]"></i>';
+                        }
+                    }
+
+                    const reviewDate = rev.date ? new Date(rev.date).toLocaleDateString('id-ID') : '-';
+
+                    container.innerHTML += `
+                        <div class="bg-[#0f1015] border border-zinc-900 p-3 rounded-xl space-y-1.5">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-black text-white uppercase tracking-wide">${rev.username || 'Anonymous'}</span>
+                                    <div class="flex gap-0.5">${starsHtml}</div>
+                                </div>
+                                <span class="text-[9px] font-mono text-zinc-500">${reviewDate}</span>
+                            </div>
+                            <p class="text-xs text-zinc-400 font-medium leading-relaxed">${rev.comment || 'Tidak ada ulasan.'}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                container.innerHTML = `
+                    <div class="py-8 text-center bg-[#0f1015]/40 border border-zinc-900/60 rounded-xl">
+                        <i class="fa-solid fa-comment-slash text-zinc-700 text-xl mb-1.5 block"></i>
+                        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Belum ada ulasan atau rating untuk item ini</p>
+                    </div>
+                `;
+            }
+        }
+
+        function buildVariantButtons() {
+            const container = document.getElementById('variantOptionsContainer');
+            container.innerHTML = '';
+
+            productData.items.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `vbtn-${index}`;
+                btn.onclick = () => selectVariantIndex(index);
+                btn.className = "px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-xs text-zinc-400 tracking-wide transition uppercase hover:text-white";
+                btn.innerText = item.subName;
+                container.appendChild(btn);
+            });
+
+            if(!productData.isVariant) {
+                selectVariantIndex(0);
+            }
+        }
+
+        function selectVariantIndex(index) {
+            selectedItemIndex = index;
+            const targetItem = productData.items[index];
+
+            document.querySelectorAll('#variantOptionsContainer button').forEach(btn => {
+                btn.className = "px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-xs text-zinc-400 tracking-wide transition uppercase hover:text-white";
+            });
+
+            const activeBtn = document.getElementById(`vbtn-${index}`);
+            if(activeBtn) {
+                activeBtn.className = "px-3 py-2.5 bg-red-600/10 border border-red-500 text-red-500 rounded-xl font-black text-xs tracking-wide transition uppercase shadow-md shadow-red-500/5";
+            }
+
+            document.getElementById('modalPrice').innerText = `Rp ${targetItem.harga.toLocaleString('id-ID')}`;
+            document.getElementById('modalStock').innerText = `STOK OPSI: ${targetItem.stok}`;
+            document.getElementById('modalSelectedVariant').innerText = `TERPILIH: ${targetItem.subName}`;
+            
+            const accordionContent = document.getElementById(`acc-content-${index}`);
+            if (accordionContent && accordionContent.classList.contains('hidden')) {
+                toggleDescriptionAccordion(index);
+            }
+
+            buyQty = 1;
+            document.getElementById('qtyDisplay').innerText = buyQty;
+            calculateFeeDisplay();
+        }
+
+        function updateQty(amount) {
+            if(selectedItemIndex === null) {
+                alert('Silahkan pilih opsi variant produk terlebih dahulu!');
+                return;
+            }
+
+            const limitStok = parseInt(productData.items[selectedItemIndex].stok || 0);
+            const nextQty = buyQty + amount;
+
+            if(nextQty < 1) return;
+            if(nextQty > 10) {
+                alert('Maksimal pembelian sekaligus adalah 10 item!');
+                return;
+            }
+            if(nextQty > limitStok) {
+                alert(`Stok tidak mencukupi! Sisa stok opsi ini tinggal ${limitStok} item.`);
+                return;
+            }
+
+            buyQty = nextQty;
+            document.getElementById('qtyDisplay').innerText = buyQty;
+            calculateFeeDisplay();
+        }
+
+        function calculateFeeDisplay() {
+            if(selectedItemIndex === null) return;
+            const itemHarga = parseInt(productData.items[selectedItemIndex].harga || 0);
+            const totalBelanja = itemHarga * buyQty;
+            
+            const adminFee = totalBelanja * 0.10;
+            document.getElementById('displayFee').innerText = `Rp ${adminFee.toLocaleString('id-ID')}`;
+        }
+
+        function openVariantModal() {
+            const modal = document.getElementById('variantModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeVariantModal() {
+            document.getElementById('variantModal').classList.add('hidden');
+        }
+
+        function executePurchase() {
+            if(selectedItemIndex === null) {
+                alert('Pilih salah satu opsi variant sebelum melakukan checkout!');
+                return;
+            }
+
+            const chosenItem = productData.items[selectedItemIndex];
+            
+            if(parseInt(chosenItem.stok) < buyQty) {
+                alert('Gagal! Item yang dipilih kehabisan stok ketersediaan.');
+                return;
+            }
+
+            const grossTotal = chosenItem.harga * buyQty;
+            const feeAdmin = grossTotal * 0.10;
+            const netToSeller = grossTotal - feeAdmin;
+
+            const orderPayload = {
+                productId: productData.productId,
+                productName: productData.productName,
+                subName: chosenItem.subName,
+                merchantName: productData.merchantName,
+                quantity: buyQty,
+                pricePerUnit: chosenItem.harga,
+                totalGrossPrice: grossTotal,
+                adminFeeDeduction: feeAdmin,
+                finalSellerRevenue: netToSeller
+            };
+
+            if(confirm(`Konfirmasi Pembelian?\n\nProduk: ${productData.productName}\nVarian: ${chosenItem.subName}\nJumlah: ${buyQty}x\nTotal Bayar: Rp ${grossTotal.toLocaleString('id-ID')}\n\n*Saldo Anda otomatis terpotong sistem.`)) {
+                
+                fetch('/api/order/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if(res.success) {
+                        alert(`PEMBELIAN BERHASIL!\n\nSaldo Anda terpotong Rp ${grossTotal.toLocaleString('id-ID')}.\nDana telah diteruskan ke merchant ${productData.merchantName} sebesar Rp ${netToSeller.toLocaleString('id-ID')} (Setelah dipotong fee admin sistem 10%).\n\nData Rahasia/Akses Link:\n-> ${res.dataRahasia || chosenItem.dataRahasia}`);
+                        closeVariantModal();
+                        window.location.reload();
+                    } else {
+                        alert('Transaksi Gagal: ' + res.message);
+                    }
+                })
+                .catch(() => {
+                    alert('Gagal melakukan transaksi, mohon periksa sisa isi saldo user Anda atau jaringan server!');
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProductDetail);
+    </script>
+</body>
+</html>

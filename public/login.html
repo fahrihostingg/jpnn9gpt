@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Masuk - {{config.webName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; touch-action: none; }</style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 h-screen w-screen overflow-hidden flex flex-col justify-between fixed inset-0 select-none">
+
+    <header class="max-w-md mx-auto w-full px-6 pt-5 flex justify-between items-center shrink-0">
+        <a href="/" class="text-xs bg-zinc-900/80 text-zinc-400 hover:text-white px-3 py-2 rounded-xl border border-zinc-800 transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Beranda
+        </a>
+        <div class="text-sm font-extrabold tracking-wider text-zinc-500">{{config.webNameUpper}}</div>
+    </header>
+
+    <main class="w-full max-w-md mx-auto px-6 flex flex-col justify-center grow">
+        <div class="bg-[#14151f]/80 border border-zinc-800/80 p-5 rounded-2xl shadow-2xl shadow-orange-500/5 w-full space-y-4">
+            
+            <div class="w-full h-28 rounded-xl overflow-hidden border border-zinc-800/80 relative shrink-0">
+                <img src="{{config.thumbnailUrl}}" alt="Thumbnail" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#14151f] to-transparent"></div>
+            </div>
+
+            <div>
+                <h1 class="text-xl font-black text-white tracking-tight">Masuk Akun</h1>
+                <p class="text-zinc-500 text-[11px] mt-0.5">Silakan masuk menggunakan email terdaftar.</p>
+            </div>
+
+            <form id="loginForm" class="space-y-3">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Masukkan Email :</label>
+                    <input type="email" id="email" required placeholder="email@gmail.com" class="w-full bg-[#0f1015] border border-zinc-800 focus:border-orange-500/50 rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-700 outline-none transition">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Masukkan PW :</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full bg-[#0f1015] border border-zinc-800 focus:border-orange-500/50 rounded-xl px-4 py-3 text-xs text-white placeholder-zinc-700 outline-none transition">
+                </div>
+
+                <div id="errorMsg" class="text-red-500 text-[11px] hidden text-center font-bold"></div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-extrabold py-3 rounded-xl shadow-lg shadow-orange-500/10 transition text-xs tracking-wide active:scale-[0.99] flex items-center justify-center gap-1.5">
+                    Masuk Sekarang
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </button>
+            </form>
+
+            <div class="text-center text-xs text-zinc-500 border-t border-zinc-900 pt-3">
+                Belum punya akun? <a href="/daftar" class="text-orange-500 font-bold hover:underline ml-1">Daftar Sini</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="max-w-md mx-auto w-full px-6 py-4 text-center text-[10px] text-zinc-600 shrink-0">Secure Login Page &copy; 2026.</footer>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            errorMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/dashboard';
+                } else {
+                    errorMsg.innerText = data.message;
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMsg.innerText = 'Gagal terhubung ke server';
+                errorMsg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

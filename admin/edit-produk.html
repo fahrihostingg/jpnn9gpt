@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Edit Produk - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1015; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-2xl mx-auto bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+                <a href="/admin/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 id="pageTitle" class="text-base font-black text-white tracking-wide uppercase">PILIH PRODUK UNTUK DIEDIT</h1>
+                    <p id="pageSubTitle" class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Console System Management</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-pen-to-square text-red-500 text-xl"></i>
+        </div>
+
+        <div id="selectProductSection" class="space-y-4">
+            <div id="loadingState" class="text-center py-10">
+                <div class="animate-spin rounded-full h-8 w-8 border-2 border-red-500 border-t-transparent mx-auto mb-3"></div>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Memuat produk jualanmu...</p>
+            </div>
+            <div id="emptyState" class="hidden text-center py-10 border border-dashed border-zinc-800 rounded-xl">
+                <i class="fa-solid fa-box-open text-zinc-600 text-3xl mb-2"></i>
+                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider">Kamu belum mengupload produk apapun</p>
+            </div>
+            <div id="adminProductGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </div>
+
+        <form id="editProductForm" class="space-y-5 hidden">
+            
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">KATEGORI PRODUK :</label>
+                <input type="text" id="displayCategory" class="w-full bg-zinc-900 text-zinc-400 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-bold outline-none cursor-not-allowed uppercase" readonly>
+                <input type="hidden" id="selectedCategory">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">NAMA PRODUK INDUK :</label>
+                    <input type="text" id="parentName" class="w-full bg-zinc-900/60 border border-zinc-800 focus:border-red-500/50 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-zinc-600 outline-none transition" required>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">ID PRODUK :</label>
+                    <input type="text" id="productId" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono font-bold outline-none cursor-not-allowed" readonly>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">FOTO PRODUK :</label>
+                <div class="flex items-center gap-3">
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="uploadToImgBB(this)">
+                    <button type="button" onclick="document.getElementById('fileInput').click()" class="px-5 py-3 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl font-bold text-xs text-zinc-300 transition flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-red-500"></i> Ganti Foto
+                    </button>
+                    <div id="uploadStatus" class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Menggunakan foto lama</div>
+                </div>
+                <input type="hidden" id="productImageUrl" required>
+            </div>
+
+            <div id="dynamicInputsContainer" class="space-y-4"></div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button type="button" onclick="cancelEdit()" class="w-full py-4 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white font-black text-xs tracking-widest rounded-xl transition uppercase">
+                    Kembali
+                </button>
+                <button type="submit" class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-xl shadow-red-600/10">
+                    Simpan Perubahan
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        const IMGBB_KEY = '37e84e2162972cbe655f784aff8b9218';
+        let myProducts = [];
+
+        async function fetchAdminProducts() {
+            try {
+                const response = await fetch('/api/admin/toko-products');
+                const result = await response.json();
+                document.getElementById('loadingState').classList.add('hidden');
+
+                if (result.success && result.data.length > 0) {
+                    myProducts = result.data;
+                    renderProductSelection(myProducts);
+                } else {
+                    document.getElementById('emptyState').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loadingState').innerHTML = `<p class="text-xs font-bold text-red-500">GAGAL MEMUAT DATA SERVER</p>`;
+            }
+        }
+
+        function renderProductSelection(products) {
+            const grid = document.getElementById('adminProductGrid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = "p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between gap-3 hover:border-red-500/40 cursor-pointer transition";
+                card.setAttribute('onclick', `loadProductToForm('${product.productId || product.id}')`);
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img src="${product.imageUrl || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-lg object-cover bg-zinc-950 shrink-0">
+                        <div class="min-w-0">
+                            <h3 class="text-xs font-black text-white uppercase truncate">${product.productName}</h3>
+                            <p class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">${product.category}</p>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-400 hover:text-red-500 transition shrink-0">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadProductToForm(id) {
+            const product = myProducts.find(p => String(p.productId || p.id) === String(id));
+            if (!product) return;
+
+            document.getElementById('pageTitle').innerText = "EDIT DETAILS PRODUK";
+            document.getElementById('pageSubTitle').innerText = "Modify Product Configuration";
+
+            document.getElementById('selectProductSection').classList.add('hidden');
+            document.getElementById('editProductForm').classList.remove('hidden');
+
+            document.getElementById('displayCategory').value = product.category;
+            document.getElementById('selectedCategory').value = product.category;
+            document.getElementById('parentName').value = product.productName;
+            document.getElementById('productId').value = product.productId || product.id;
+            document.getElementById('productImageUrl').value = product.imageUrl;
+            document.getElementById('uploadStatus').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Menggunakan foto lama';
+
+            generateEditInputs(product);
+        }
+
+        function generateEditInputs(product) {
+            const container = document.getElementById('dynamicInputsContainer');
+            container.innerHTML = '';
+            const cat = product.category;
+
+            if (!product.items || !Array.isArray(product.items)) return;
+
+            product.items.forEach((item, index) => {
+                const i = index + 1;
+                const itemBox = document.createElement('div');
+                itemBox.className = "p-4 bg-zinc-900/40 border border-zinc-800/80 rounded-xl space-y-3";
+                
+                let specificFields = '';
+
+                if (cat === 'AKUN PREMIUM') {
+                    specificFields = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">EMAIL :</label><input type="email" name="email_${i}" value="${item.email || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">PASSWORD :</label><input type="text" name="pw_${i}" value="${item.pw || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                    `;
+                } else if (cat === 'APLIKASI STREAMING') {
+                    specificFields = `
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">LINK APK :</label><input type="url" name="link_apk_${i}" value="${item.linkApk || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                    `;
+                } else if (cat === 'AKUN GAME') {
+                    specificFields = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">EMAIL GAME / ID :</label><input type="text" name="email_${i}" value="${item.email || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">PW GAME :</label><input type="text" name="pw_${i}" value="${item.pw || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="space-y-1 text-left">
+                            <label class="text-[10px] text-zinc-500 font-bold">A2F AUTHENTICATOR :</label>
+                            <select name="a2f_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none">
+                                <option value="OFF" ${item.a2f === 'OFF' ? 'selected' : ''}>OFF</option>
+                                <option value="ON" ${item.a2f === 'ON' ? 'selected' : ''}>ON</option>
+                            </select>
+                        </div>
+                    `;
+                } else if (cat === 'LAIN NYA') {
+                    specificFields = `
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">URL / LINK PRODUK :</label><input type="url" name="url_produk_${i}" value="${item.urlProduk || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                    `;
+                }
+
+                itemBox.innerHTML = `
+                    <div class="text-[10px] font-black text-red-500 bg-red-500/10 px-2 py-1 rounded-md inline-block uppercase tracking-wider mb-2">DATA DATA PRODUK / VARIANT ${i}</div>
+                    <div class="space-y-1 mb-2">
+                        <label class="text-[10px] text-zinc-400 font-bold">NAMA SUB-PRODUK VARIANT :</label>
+                        <input type="text" name="sub_name_${i}" value="${item.subName || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-2">
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">HARGA :</label><input type="number" name="harga_${i}" value="${item.harga || 0}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">STOK :</label><input type="number" name="stok_${i}" value="${item.stok || 0}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                    </div>
+                    ${specificFields}
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI :</label><textarea name="deskripsi_${i}" rows="2" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required>${item.deskripsi || ''}</textarea></div>
+                    <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI TAMBAHAN :</label><input type="text" name="deskripsi_ext_${i}" value="${item.deskripsiExt || ''}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none"></div>
+                `;
+                container.appendChild(itemBox);
+            });
+        }
+
+        function uploadToImgBB(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-500 mr-1"></i> MENGUPLOAD FOTO BARU...';
+            
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    document.getElementById('productImageUrl').value = res.data.display_url;
+                    status.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> FOTO BARU TER-UPLOAD';
+                } else {
+                    status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> GAGAL UPLOAD FOTO';
+                }
+            })
+            .catch(() => {
+                status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> ERROR NET';
+            });
+        }
+
+        function cancelEdit() {
+            document.getElementById('pageTitle').innerText = "PILIH PRODUK UNTUK DIEDIT";
+            document.getElementById('pageSubTitle').innerText = "Console System Management";
+            document.getElementById('editProductForm').classList.add('hidden');
+            document.getElementById('selectProductSection').classList.remove('hidden');
+            fetchAdminProducts();
+        }
+
+        document.getElementById('editProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const category = document.getElementById('selectedCategory').value;
+            const parentId = document.getElementById('productId').value;
+            const parentName = document.getElementById('parentName').value;
+            const imageUrl = document.getElementById('productImageUrl').value;
+
+            const product = myProducts.find(p => String(p.productId || p.id) === String(parentId));
+            if(!product) return;
+
+            let updatedItemsList = [];
+
+            product.items.forEach((item, index) => {
+                let i = index + 1;
+                let baseData = {
+                    subName: document.getElementsByName(`sub_name_${i}`)[0].value,
+                    harga: parseInt(document.getElementsByName(`harga_${i}`)[0].value || 0),
+                    stok: parseInt(document.getElementsByName(`stok_${i}`)[0].value || 0),
+                    deskripsi: document.getElementsByName(`deskripsi_${i}`)[0].value,
+                    deskripsiExt: document.getElementsByName(`deskripsi_ext_${i}`)[0].value
+                };
+
+                if (category === 'AKUN PREMIUM') {
+                    baseData.email = document.getElementsByName(`email_${i}`)[0].value;
+                    baseData.pw = document.getElementsByName(`pw_${i}`)[0].value;
+                } else if (category === 'APLIKASI STREAMING') {
+                    baseData.linkApk = document.getElementsByName(`link_apk_${i}`)[0].value;
+                } else if (category === 'AKUN GAME') {
+                    baseData.email = document.getElementsByName(`email_${i}`)[0].value;
+                    baseData.pw = document.getElementsByName(`pw_${i}`)[0].value;
+                    baseData.a2f = document.getElementsByName(`a2f_${i}`)[0].value;
+                } else if (category === 'LAIN NYA') {
+                    baseData.urlProduk = document.getElementsByName(`url_produk_${i}`)[0].value;
+                }
+
+                updatedItemsList.push(baseData);
+            });
+
+            const finalPayload = {
+                productId: parentId,
+                productName: parentName,
+                imageUrl: imageUrl,
+                items: updatedItemsList
+            };
+
+            fetch('/api/admin/product/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalPayload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    alert('Sukses memperbarui data produk!');
+                    cancelEdit();
+                } else {
+                    alert('Gagal update: ' + res.message);
+                }
+            })
+            .catch(() => alert('Terjadi gangguan jaringan atau server mati.'));
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchAdminProducts);
+    </script>
+</body>
+</html>

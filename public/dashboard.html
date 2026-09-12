@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Member</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex relative select-none overflow-x-hidden">
+
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#11121a] border-r border-zinc-800/60 transform -translate-x-full lg:translate-x-0 lg:static lg:flex transition-all duration-300 ease-in-out flex flex-col shadow-2xl shrink-0">
+        <div class="p-6 border-b border-zinc-900/80 flex justify-between items-center bg-[#141522]/40">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-2 h-5 bg-gradient-to-b from-orange-500 to-red-600 rounded-full"></div>
+                <div class="text-sm font-extrabold tracking-widest text-white uppercase bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                    {{config.webNameUpper}}
+                </div>
+            </div>
+            <button onclick="closeSidebarMenu()" class="w-8 h-8 rounded-lg bg-zinc-900/50 border border-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition lg:hidden active:scale-95">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <div class="p-4 flex-grow overflow-y-auto space-y-6">
+            <div id="menuContainer" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <div id="sidebarOverlay" onclick="closeSidebarMenu()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 hidden transition-all duration-300 lg:hidden"></div>
+
+    <div class="flex-grow flex flex-col min-h-screen w-full overflow-x-hidden">
+        
+        <header class="w-full bg-[#11121a]/60 border-b border-zinc-800/50 px-4 sm:px-6 py-4 flex justify-between items-center shrink-0 sticky top-0 backdrop-blur-xl z-10">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebarMenu()" class="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-95 lg:hidden">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider">Dashboard User</div>
+            </div>
+            
+            <div class="flex items-center space-x-3 ml-auto">
+                <button onclick="openProfileModal()" class="flex items-center space-x-2 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 px-2.5 py-1.5 rounded-xl transition active:scale-95">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center text-white font-black text-[11px] shadow-md" id="userInitial">
+                        ?
+                    </div>
+                    <span class="text-xs font-bold text-zinc-300 max-w-[80px] truncate" id="topUsername">Loading...</span>
+                </button>
+                <a href="/logout" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-500 hover:text-red-400 font-bold px-3 py-2 rounded-xl border border-zinc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                    <span class="hidden sm:inline">Keluar</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-grow p-4 sm:p-6 space-y-6 w-full max-w-4xl mx-auto pb-24">
+            
+            <div class="bg-[#14151f]/40 border border-zinc-800/60 p-6 rounded-3xl relative overflow-hidden shadow-xl">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl"></div>
+                <div class="relative z-10">
+                    <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">
+                        WELCOME <span class="text-orange-500 uppercase" id="welcomeUsername">USER</span> TO {{config.webNameUpper}}
+                    </h2>
+                    <p class="text-zinc-500 text-xs sm:text-sm font-bold mt-2 leading-relaxed uppercase tracking-wide">
+                        Semoga betah dah di web ini biar ga <br class="hidden sm:block"> pindah ke web lain wkwk. sehat-sehat!
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2 px-1">
+                    <i class="fa-solid fa-wallet text-zinc-500"></i>
+                    INFORMASI KEUANGAN & INTEGRASI
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-gradient-to-br from-[#14151f] to-[#261c13] border border-orange-500/10 p-5 rounded-2xl shadow-xl flex flex-col justify-between min-h-[120px]">
+                        <div>
+                            <p class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Sisa Saldo Kamu</p>
+                            <h3 id="userSaldo" class="text-2xl font-black text-white tracking-tight mt-0.5">Rp 0</h3>
+                        </div>
+                        <a href="/deposit" class="mt-4 w-full sm:w-fit justify-center px-4 py-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20 text-orange-400 font-bold rounded-xl text-xs transition flex items-center gap-2 active:scale-[0.99]">
+                            <i class="fa-solid fa-circle-arrow-down"></i>
+                            Deposit Saldo
+                        </a>
+                    </div>
+
+                    <div class="bg-[#14151f]/80 border border-zinc-800/80 p-5 rounded-2xl shadow-xl flex flex-col justify-between min-h-[120px]">
+                        <div>
+                            <h4 class="text-white font-extrabold text-xs uppercase tracking-wider">Integrasi API Key</h4>
+                            <p class="text-[10px] text-zinc-500 mt-0.5">Gunakan key ini untuk menghubungkan aplikasi external.</p>
+                        </div>
+                        <div class="flex gap-2 mt-3 relative">
+                            <input type="text" id="apiKeyValue" readonly value="Loading..." class="w-full bg-[#0f1015] border border-zinc-800 font-mono text-zinc-400 rounded-xl px-3 py-2 text-xs outline-none pr-16">
+                            <button onclick="copyApiKey()" class="absolute right-1.5 top-1.5 bottom-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700/60 text-white font-bold px-3 rounded-lg text-xs transition active:scale-95">
+                                Salin
+                            </button>
+                        </div>
+                        <div id="copyNotif" class="text-emerald-400 text-[10px] font-bold mt-1 hidden">✓ Berhasil disalin!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2 px-1">
+                    <i class="fa-solid fa-store text-zinc-500"></i>
+                    MASUK TOKO / MARKETPLACE
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a href="/listproduk" class="group bg-gradient-to-br from-[#14151f] to-[#121c1a] border border-zinc-800/60 hover:border-emerald-500/30 p-5 rounded-2xl shadow-xl relative overflow-hidden flex items-center justify-between min-h-[100px] transition duration-300 transform hover:-translate-y-0.5">
+                        <div class="space-y-1 z-10">
+                            <h3 class="text-base font-black text-white tracking-wide group-hover:text-emerald-400 transition">MARKET PRODUK</h3>
+                            <p class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Beli Script, Source Code, & Produk Digital</p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20 group-hover:bg-emerald-500/20 group-hover:scale-105 transition shrink-0 z-10">
+                            <i class="fa-solid fa-box text-base"></i>
+                        </div>
+                        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition"></div>
+                    </a>
+
+                    <a href="/listjasa" class="group bg-gradient-to-br from-[#14151f] to-[#1a1326] border border-zinc-800/60 hover:border-purple-500/30 p-5 rounded-2xl shadow-xl relative overflow-hidden flex items-center justify-between min-h-[100px] transition duration-300 transform hover:-translate-y-0.5">
+                        <div class="space-y-1 z-10">
+                            <h3 class="text-base font-black text-white tracking-wide group-hover:text-purple-400 transition">MARKET JASA</h3>
+                            <p class="text-zinc-500 text-[10px] uppercase font-bold tracking-wider">Jasa Pembuatan Website, App, & Konsultasi</p>
+                        </div>
+                        <div class="w-11 h-11 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20 group-hover:bg-purple-500/20 group-hover:scale-105 transition shrink-0 z-10">
+                            <i class="fa-solid fa-screwdriver-wrench text-base"></i>
+                        </div>
+                        <div class="absolute -right-6 -bottom-6 w-20 h-20 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition"></div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-[#14151f]/80 border border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-4 border-b border-zinc-900 bg-[#161722]/50 flex justify-between items-center">
+                    <h4 class="text-white font-extrabold text-xs uppercase tracking-wider">Riwayat Transaksi Terbaru</h4>
+                    <span class="text-[10px] text-orange-400 font-bold bg-orange-500/10 px-2 py-0.5 rounded">Realtime</span>
+                </div>
+                <div id="historyScrollWrapper" class="max-h-[350px] overflow-y-auto custom-scroll">
+                    <div id="listHistory" class="p-10 text-center">
+                        <p class="text-zinc-600 text-xs font-medium">Belum ada riwayat transaksi atau aktivitas pembelian.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="profileModal" class="fixed inset-0 z-50 invisible flex items-center justify-center p-4 transition-all duration-300">
+        <div onclick="closeProfileModal()" class="absolute inset-0 bg-black/75 backdrop-blur-xs"></div>
+        
+        <div class="bg-[#14151f] border border-zinc-800 w-full max-w-sm rounded-2xl p-5 shadow-2xl relative z-10 transform scale-95 opacity-0 transition-all duration-300" id="modalContainer">
+            <div class="flex justify-between items-start border-b border-zinc-900 pb-3">
+                <h3 class="text-white font-black text-sm tracking-wide uppercase">Profil Pengguna</h3>
+                <button onclick="closeProfileModal()" class="text-zinc-500 hover:text-white transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="mt-4 flex flex-col items-center border-b border-zinc-900 pb-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-orange-500 to-red-600 flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-orange-500/10 mb-3" id="modalInitial">
+                    ?
+                </div>
+                <h4 class="text-white font-extrabold text-sm tracking-wide" id="modalUsername">Loading...</h4>
+                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md font-bold mt-1 uppercase tracking-wider">Active Member</span>
+            </div>
+
+            <div class="py-4 space-y-3">
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Alamat Email</span>
+                    <span class="text-xs text-zinc-200 font-medium" id="modalEmail">Loading...</span>
+                </div>
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Nomor Handphone</span>
+                    <span class="text-xs text-zinc-200 font-mono" id="modalPhone">Loading...</span>
+                </div>
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Personal API Key</span>
+                    <span class="text-xs text-orange-400 font-mono" id="modalApiKey">Loading...</span>
+                </div>
+            </div>
+
+            <button onclick="closeProfileModal()" class="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold rounded-xl text-xs transition active:scale-[0.98]">
+                Tutup Jendela
+            </button>
+        </div>
+    </div>
+
+    <div id="broadcastModal" class="fixed inset-0 z-50 invisible flex items-center justify-center p-4 transition-all duration-300">
+        <div onclick="closeBroadcastModal()" class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="bg-[#14151f] border-2 border-red-500/30 w-full max-w-md rounded-2xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.15)] relative z-10 transform scale-95 opacity-0 transition-all duration-300" id="bcContainer">
+            <div class="flex justify-between items-center border-b border-zinc-800/80 pb-3">
+                <div id="bcHeaderWrapper" class="flex items-center gap-2 text-red-500 animate-pulse">
+                    <i class="fa-solid fa-bullhorn text-sm"></i>
+                    <h3 class="font-black text-xs tracking-widest uppercase" id="bcPopupLabel">BROADCAST BY OWNER</h3>
+                </div>
+                <button onclick="closeBroadcastModal()" class="w-7 h-7 bg-zinc-900 rounded-lg border border-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition text-xs">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="py-4 space-y-2 text-left">
+                <h2 class="text-white font-black text-sm uppercase tracking-wide" id="bcPopupTitle">JUDUL PENGUMUMAN</h2>
+                <p class="text-xs text-zinc-400 font-bold leading-relaxed whitespace-pre-wrap" id="bcPopupMessage">Isi pesan broadcast.</p>
+            </div>
+            <button onclick="closeBroadcastModal()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs tracking-widest transition uppercase shadow-lg shadow-red-600/10">
+                SAYA MENGERTI
+            </button>
+        </div>
+    </div>
+
+    <a href="/auto-ai.html" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-tr from-red-600 to-orange-500 text-white rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:scale-110 active:scale-95 transition-all duration-300 z-40 group">
+        <i class="fa-solid fa-robot text-lg group-hover:rotate-12 transition-transform"></i>
+    </a>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const MENU_LIST = [
+                {
+                    header: "Menu Utama",
+                    buttons: [
+                        {
+                            nama: "PROFILE",
+                            logo: "fa-regular fa-user",
+                            aksi: "openProfileModal()",
+                            isActive: true
+                        },
+                        {
+                            nama: "RIWAYAT DEPOSIT",
+                            logo: "fa-solid fa-credit-card",
+                            aksi: "window.location.href = '/riwayat-deposit.html'"
+                        },
+                        {
+                            nama: "RIWAYAT PEMBELIAN",
+                            logo: "fa-solid fa-bag-shopping",
+                            aksi: "window.location.href = '/riwayatpembelian'"
+                        }
+                    ]
+                },
+                {
+                    header: "LAYANAN PRE-ORDER (PO)",
+                    buttons: [
+                        {
+                            nama: "PO PRODUK",
+                            logo: "fa-solid fa-clock",
+                            aksi: "window.location.href = '/produk-po.html'"
+                        },
+                        {
+                            nama: "RIWAYAT PO",
+                            logo: "fa-solid fa-clock-rotate-left",
+                            aksi: "window.location.href = '/riwayat-po.html'"
+                        }
+                    ]
+                },
+                {
+                    header: "KEMITRAAN & JABATAN",
+                    buttons: [
+                        {
+                            nama: "DAFTAR ADMIN",
+                            logo: "fa-solid fa-user-shield",
+                            aksi: "window.location.href = '/requestrole'"
+                        },
+                        {
+                            nama: "RIWAYAT REQUEST",
+                            logo: "fa-solid fa-clock-rotate-left",
+                            aksi: "window.location.href = '/riwayatreqrole'"
+                        }
+                    ]
+                },
+                {
+                    header: "MARKET LELANG",
+                    buttons: [
+                        {
+                            nama: "MASUK MARKET LELANG",
+                            logo: "fa-solid fa-gavel",
+                            aksi: "window.location.href = '/market-lelang'"
+                        },
+                        {
+                            nama: "UPLOAD PRODUK LELANG",
+                            logo: "fa-solid fa-cloud-arrow-up",
+                            aksi: "window.location.href = '/upload-lelang'"
+                        },
+                        {
+                            nama: "RIWAYAT LELANG",
+                            logo: "fa-solid fa-boxes-stacked",
+                            aksi: "window.location.href = '/riwayat-lelang'"
+                        }
+                    ]
+                }
+            ];
+
+            const menuContainer = document.getElementById('menuContainer');
+            menuContainer.innerHTML = MENU_LIST.map(section => {
+                const buttonsHtml = section.buttons.map(btn => {
+                    const styleClass = btn.isActive 
+                        ? "w-full text-left text-xs font-bold text-white bg-[#1a1b26] px-3.5 py-3 rounded-xl transition flex items-center gap-3 border border-orange-500/20 border-l-4 border-l-orange-500 shadow-md shadow-orange-500/5 group"
+                        : "w-full text-left text-xs font-bold text-zinc-400 hover:text-white hover:bg-[#141520]/80 px-3.5 py-3 rounded-xl transition flex items-center gap-3 border border-transparent hover:border-zinc-800/60 group";
+                        
+                    return `
+                        <button onclick="${btn.aksi}" class="${styleClass}">
+                            <i class="${btn.logo} text-orange-500/80 group-hover:text-orange-500 text-sm w-5 text-center transition-colors"></i>
+                            <span class="tracking-wider uppercase text-[11px] font-bold">${btn.nama}</span>
+                        </button>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="space-y-2">
+                        <div class="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-2 opacity-75">
+                            ${section.header}
+                        </div>
+                        <div class="space-y-1.5">
+                            ${buttonsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            fetch('/api/user-session')
+                .then(response => {
+                    if (!response.ok) {
+                        window.location.href = '/login';
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.valid) {
+                        const user = data.user;
+                        document.getElementById('topUsername').innerText = user.username;
+                        document.getElementById('welcomeUsername').innerText = user.username;
+                        document.getElementById('modalUsername').innerText = user.username;
+                        document.getElementById('modalEmail').innerText = user.email || '-';
+                        document.getElementById('modalPhone').innerText = user.nomorHp || '-';
+                        document.getElementById('modalApiKey').innerText = user.apiKey || '-';
+                        document.getElementById('apiKeyValue').value = user.apiKey || '';
+                        
+                        const realSaldo = parseInt(user.saldo || 0);
+                        document.getElementById('userSaldo').innerText = 'Rp ' + realSaldo.toLocaleString('id-ID');
+                        
+                        const initial = user.username.charAt(0).toUpperCase();
+                        document.getElementById('userInitial').innerText = initial;
+                        document.getElementById('modalInitial').innerText = initial;
+
+                        checkBroadcastSystem();
+                    } else {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(() => {
+                    window.location.href = '/login';
+                });
+                
+            fetch('/api/order/history')
+              .then(res => res.json())
+              .then(res => {
+                  const historyDiv = document.getElementById('listHistory');
+                  if (res.success && res.data && res.data.length > 0) {
+                      const listHtml = res.data.reverse().map(log => `
+                          <div class="flex justify-between items-center p-4 border-b border-zinc-900/60 hover:bg-zinc-900/10 transition px-6">
+                              <div class="flex flex-col text-left">
+                                  <span class="text-xs font-mono font-bold text-zinc-300">${log.invoiceId || log.trx_id}</span>
+                                  <span class="text-[11px] text-orange-400 font-extrabold mt-0.5 uppercase tracking-wide">${log.productName || 'Pembelian Produk'}</span>
+                                  <span class="text-[9px] text-zinc-500 mt-0.5">${log.createdAt ? new Date(log.createdAt).toLocaleString('id-ID') : log.date || ''}</span>
+                              </div>
+                              <div class="flex flex-col items-end">
+                                  <span class="text-xs font-black text-red-400">-Rp ${parseInt(log.totalGrossPrice || 0).toLocaleString('id-ID')}</span>
+                                  <span class="text-[9px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded-md font-black uppercase tracking-wider mt-1 border border-red-500/10">BERHASIL</span>
+                              </div>
+                          </div>
+                      `).join('');
+                      historyDiv.className = "divide-y divide-zinc-900/40 text-left";
+                      historyDiv.innerHTML = listHtml;
+                  }
+              })
+              .catch(err => {
+                  console.log(err);
+              });
+        });
+
+        function checkBroadcastSystem() {
+           fetch('/api/owner/broadcast')
+        .then(res => res.json())
+        .then(res => {
+            if (res.success && res.data) {
+                const data = res.data;
+                const statusBroadcast = (data.status || data.isActive || '').toString().toLowerCase().trim();
+                
+                if (statusBroadcast === 'aktif' || statusBroadcast === 'true' || statusBroadcast === 'active') {
+                    const pesan = data.message || data.msg || data.text || '';
+                    const judul = data.title || data.judul || 'PENGUMUMAN';
+                    const tipe = (data.type || data.tipe || 'info').toString().toLowerCase().trim();
+
+                    document.getElementById('bcPopupTitle').innerText = judul;
+                    document.getElementById('bcPopupMessage').innerText = pesan;
+                    
+                    const label = document.getElementById('bcPopupLabel');
+                    const wrapper = document.getElementById('bcHeaderWrapper');
+                    
+                    if (tipe === 'danger' || tipe === 'alert') {
+                        label.innerText = "BROADCAST BY OWNER [ALERT]";
+                        wrapper.className = "flex items-center gap-2 text-red-500 animate-pulse";
+                    } else if (tipe === 'warning') {
+                        label.innerText = "BROADCAST BY OWNER [WARNING]";
+                        wrapper.className = "flex items-center gap-2 text-amber-500 animate-pulse";
+                    } else if (tipe === 'success') {
+                        label.innerText = "BROADCAST BY OWNER [INFO PROMO]";
+                        wrapper.className = "flex items-center gap-2 text-emerald-400 animate-pulse";
+                    } else {
+                        label.innerText = "BROADCAST BY OWNER";
+                        wrapper.className = "flex items-center gap-2 text-blue-400 animate-pulse";
+                    }
+
+                    openBroadcastModal();
+                }
+            }
+        }).catch(() => {});
+      }
+
+        function openBroadcastModal() {
+            const modal = document.getElementById("broadcastModal");
+            const container = document.getElementById("bcContainer");
+            modal.classList.remove("invisible");
+            setTimeout(() => {
+                container.classList.remove("scale-95", "opacity-0");
+                container.classList.add("scale-100", "opacity-100");
+            }, 10);
+        }
+
+        function closeBroadcastModal() {
+            const modal = document.getElementById("broadcastModal");
+            const container = document.getElementById("bcContainer");
+            container.classList.remove("scale-100", "opacity-100");
+            container.classList.add("scale-95", "opacity-0");
+            setTimeout(() => {
+                modal.classList.add("invisible");
+            }, 300);
+        }
+
+        function toggleSidebarMenu() {
+            const sidebar = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            sidebar.classList.toggle("-translate-x-full");
+            overlay.classList.toggle("hidden");
+        }
+
+        function closeSidebarMenu() {
+            const sidebar = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            sidebar.classList.add("-translate-x-full");
+            overlay.classList.add("hidden");
+        }
+
+        function openProfileModal() {
+            closeSidebarMenu();
+            const modal = document.getElementById("profileModal");
+            const container = document.getElementById("modalContainer");
+            modal.classList.remove("invisible");
+            setTimeout(() => {
+                container.classList.remove("scale-95", "opacity-0");
+                container.classList.add("scale-100", "opacity-100");
+            }, 10);
+        }
+
+        function closeProfileModal() {
+            const modal = document.getElementById("profileModal");
+            const container = document.getElementById("modalContainer");
+            container.classList.remove("scale-100", "opacity-100");
+            container.classList.add("scale-95", "opacity-0");
+            setTimeout(() => {
+                modal.classList.add("invisible");
+            }, 300);
+        }
+
+        function copyApiKey() {
+            const copyText = document.getElementById("apiKeyValue");
+            navigator.clipboard.writeText(copyText.value);
+            const notif = document.getElementById("copyNotif");
+            notif.classList.remove("hidden");
+            setTimeout(() => { notif.classList.add("hidden"); }, 2000);
+        }
+    </script>
+</body>
+</html>

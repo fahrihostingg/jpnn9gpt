@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hapus Produk - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-row relative select-none overflow-x-hidden">
+
+    <div id="sidebarMenu" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#14151f] border-r border-zinc-800/80 transform -translate-x-full lg:translate-x-0 lg:static lg:flex transition-transform duration-300 ease-in-out flex flex-col shadow-2xl shrink-0">
+        <div class="p-5 border-b border-zinc-900/60 flex justify-between items-center">
+            <div class="text-xs font-black tracking-wider text-red-500 uppercase">
+                ADMIN DASHBOARD 
+            </div>
+            <button onclick="toggleSidebarMenu()" class="text-zinc-500 hover:text-white transition lg:hidden p-1">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 flex-grow space-y-5 overflow-y-auto">
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Navigasi Utama</div>
+                <div class="space-y-1">
+                    <a href="/admin/dashboard" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-gauge text-red-500 w-4 text-center text-sm"></i>
+                        <span>DASHBOARD SYSTEM</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wider px-3 mb-1.5">Akses Menu</div>
+                <div class="space-y-1">
+                    <a href="/admin/tambah-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-plus text-red-500 w-4 text-center"></i>
+                        <span>TAMBAH PRODUK</span>
+                    </a>
+                    <a href="/admin/hapus-produk.html" class="w-full text-xs font-bold text-white bg-zinc-900/80 border border-red-500/30 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-trash text-red-500 w-4 text-center"></i>
+                        <span>HAPUS PRODUK</span>
+                    </a>
+                    <a href="/admin/list-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-boxes-stacked text-red-500 w-4 text-center"></i>
+                        <span>LIST PRODUK</span>
+                    </a>
+                    <a href="/admin/edit-produk.html" class="w-full text-xs font-bold text-zinc-400 hover:text-white hover:bg-zinc-900 px-4 py-3 rounded-xl transition flex items-center gap-2.5">
+                        <i class="fa-solid fa-pen-to-square text-red-500 w-4 text-center"></i>
+                        <span>EDIT PRODUK</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebarOverlay" onclick="toggleSidebarMenu()" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 hidden transition-all duration-300 lg:hidden"></div>
+
+    <div class="flex-grow flex flex-col min-h-screen w-full min-w-0 overflow-x-hidden">
+        
+        <header class="w-full bg-[#14151f]/50 border-b border-zinc-800/80 px-4 sm:px-6 py-4 flex justify-between items-center shrink-0 sticky top-0 backdrop-blur-md z-30">
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleSidebarMenu()" class="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center border border-zinc-800 text-zinc-400 hover:text-white transition active:scale-95 lg:hidden">
+                    <i class="fa-solid fa-bars text-base"></i>
+                </button>
+                <div class="text-xs sm:text-sm text-zinc-400 font-extrabold uppercase tracking-wider">Hapus Inventori Produk</div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <a href="/dashboard" class="text-xs bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold px-3.5 py-2.5 rounded-xl border border-zinc-800 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span class="hidden sm:inline">Dashboard User</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="flex-grow p-4 sm:p-6 space-y-6 w-full max-w-4xl mx-auto">
+            
+            <div class="space-y-1">
+                <div class="text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <i class="fa-solid fa-triangle-exclamation"></i> KONTROL DESTRUKTIF PRODUK
+                </div>
+                <h2 class="text-xl font-extrabold text-white tracking-tight">MANAJEMEN PENGHAPUSAN PRODUK AKTIF</h2>
+                <p class="text-xs text-zinc-500">Semua produk yang berhasil dihapus akan langsung hilang permanen dari database etalase pembeli.</p>
+            </div>
+
+            <div class="w-full bg-[#14151f] border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
+                <div class="p-4 bg-zinc-900/40 border-b border-zinc-800/60 flex items-center justify-between">
+                    <span class="text-[10px] font-black text-zinc-400 uppercase tracking-wider"><i class="fa-solid fa-folder-open mr-1 text-red-500"></i> Daftar Produk Anda</span>
+                    <span id="productCounter" class="text-[10px] font-mono bg-zinc-800 px-2 py-0.5 rounded text-zinc-400">0 Item</span>
+                </div>
+
+                <div id="loadingState" class="p-10 text-center space-y-2">
+                    <i class="fa-solid fa-circle-notch fa-spin text-red-500 text-xl"></i>
+                    <p class="text-xs text-zinc-500 font-bold uppercase tracking-wider">Menghubungkan ke database berkas...</p>
+                </div>
+
+                <div id="emptyState" class="p-10 text-center space-y-2 hidden">
+                    <i class="fa-solid fa-box-open text-zinc-700 text-3xl block"></i>
+                    <p class="text-xs text-zinc-400 font-extrabold uppercase tracking-wider">Kamu Belum Mengupload Produk</p>
+                    <p class="text-[11px] text-zinc-500">Silakan ke menu tambah produk terlebih dahulu.</p>
+                </div>
+
+                <div id="productListContainer" class="divide-y divide-zinc-800/60 hidden">
+                    </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="alertModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs hidden">
+        <div class="bg-[#14151f] border border-zinc-800 max-w-sm w-full rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+            <div id="modalIcon" class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto text-lg">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="space-y-1">
+                <h4 id="modalTitle" class="text-sm font-black text-white uppercase tracking-wide">Pemberitahuan</h4>
+                <p id="modalMessage" class="text-xs text-zinc-400 leading-relaxed"></p>
+            </div>
+            <button onclick="closeModal()" class="w-full bg-zinc-950 border border-zinc-800 text-zinc-300 font-black text-xs py-2.5 rounded-xl hover:bg-zinc-900 transition">OK, MENGERTI</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebarMenu() {
+            const sidebar = document.getElementById("sidebarMenu");
+            const overlay = document.getElementById("sidebarOverlay");
+            if(sidebar && overlay) {
+                sidebar.classList.toggle("-translate-x-full");
+                overlay.classList.toggle("hidden");
+            }
+        }
+
+        function showAlert(title, message, isSuccess = true) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            const iconContainer = document.getElementById('modalIcon');
+            
+            if (isSuccess) {
+                iconContainer.className = "w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto text-lg";
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                iconContainer.className = "w-12 h-12 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mx-auto text-lg";
+                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            }
+            document.getElementById('alertModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+        }
+
+        function loadProducts() {
+            const loading = document.getElementById('loadingState');
+            const empty = document.getElementById('emptyState');
+            const list = document.getElementById('productListContainer');
+            const counter = document.getElementById('productCounter');
+
+            fetch('/api/admin/toko-products')
+                .then(res => res.json())
+                .then(res => {
+                    loading.classList.add('hidden');
+                    if (res.success && res.data && res.data.length > 0) {
+                        counter.innerText = res.data.length + ' Item';
+                        list.innerHTML = '';
+                        
+                        res.data.forEach(p => {
+                            const variantCount = p.items ? p.items.length : 0;
+                            const itemHtml = `
+                                <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#14151f] hover:bg-zinc-900/40 transition">
+                                    <div class="flex items-start space-x-3.5 min-w-0">
+                                        <div class="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500 shrink-0">
+                                            <i class="fa-solid fa-box text-sm text-red-500"></i>
+                                        </div>
+                                        <div class="space-y-0.5 min-w-0">
+                                            <span class="text-[9px] font-mono text-zinc-500 bg-zinc-950 px-1.5 py-0.5 rounded border border-zinc-900">${p.productId || p.id}</span>
+                                            <h4 class="text-sm font-extrabold text-white truncate tracking-wide">${p.productName}</h4>
+                                            <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-500">
+                                                <span class="text-zinc-400 font-bold">${p.category}</span>
+                                                <span class="text-zinc-600">•</span>
+                                                <span>${variantCount} Varian Opsi</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button onclick="deleteProduct('${p.productId || p.id}')" class="text-xs bg-red-950/40 hover:bg-red-600 text-red-400 hover:text-white font-black px-4 py-2.5 rounded-xl border border-red-900/30 hover:border-red-500/50 transition flex items-center justify-center gap-1.5 active:scale-95 shrink-0">
+                                        <i class="fa-solid fa-trash-can text-xs"></i>
+                                        <span>HAPUS PERMANEN</span>
+                                    </button>
+                                </div>
+                            `;
+                            list.innerHTML += itemHtml;
+                        });
+                        
+                        empty.classList.add('hidden');
+                        list.classList.remove('hidden');
+                    } else {
+                        counter.innerText = '0 Item';
+                        list.classList.add('hidden');
+                        empty.classList.remove('hidden');
+                    }
+                })
+                .catch(e => {
+                    loading.classList.add('hidden');
+                    showAlert('ERROR SISTEM', 'Gagal memuat database internal inventori.', false);
+                });
+        }
+
+        function deleteProduct(id) {
+            if(confirm('Apakah Anda yakin ingin menghapus produk ini secara permanen dari sistem database berkas?')) {
+                fetch('/api/admin/product/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: id })
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        showAlert('SUKSES', 'Produk berhasil dimusnahkan dari database berkas!', true);
+                        loadProducts(); // Reload list otomatis
+                    } else {
+                        showAlert('GAGAL', res.message || 'Gagal menghapus produk.', false);
+                    }
+                })
+                .catch(e => {
+                    showAlert('ERROR', 'Terjadi kesalahan sistem saat menghubungi backend.', false);
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadProducts);
+    </script>
+</body>
+</html>

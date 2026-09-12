@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tambah Produk - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="bg-[#0f1015] text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-2xl mx-auto bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+                <a href="/admin/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase">ADD NEW PRODUCT</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Console System Upload</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-box-open text-red-500 text-xl"></i>
+        </div>
+
+        <form id="productForm" class="space-y-5">
+            
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">PILIH KATEGORI UTAMA :</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="setCategory('AKUN PREMIUM')" id="cat-AKUN PREMIUM" class="cat-btn py-3.5 px-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide hover:text-white transition uppercase">Akun Premium</button>
+                    <button type="button" onclick="setCategory('APLIKASI STREAMING')" id="cat-APLIKASI STREAMING" class="cat-btn py-3.5 px-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide hover:text-white transition uppercase">Aplikasi Streaming</button>
+                    <button type="button" onclick="setCategory('AKUN GAME')" id="cat-AKUN GAME" class="cat-btn py-3.5 px-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide hover:text-white transition uppercase">Akun Game</button>
+                    <button type="button" onclick="setCategory('LAIN NYA')" id="cat-LAIN NYA" class="cat-btn py-3.5 px-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide hover:text-white transition uppercase">Lainnya</button>
+                </div>
+                <input type="hidden" id="selectedCategory" required>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">NAMA PRODUK INDUK :</label>
+                    <input type="text" id="parentName" placeholder="Contoh: YOUTUBE PREMIUM" class="w-full bg-zinc-900/60 border border-zinc-800 focus:border-red-500/50 rounded-xl px-4 py-3 text-sm font-bold text-white placeholder-zinc-600 outline-none transition" required>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">ID PRODUK (AUTO) :</label>
+                    <input type="text" id="productId" class="w-full bg-zinc-900 text-zinc-500 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono font-bold outline-none cursor-not-allowed" readonly>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">FOTO PRODUK :</label>
+                <div class="flex items-center gap-3">
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="uploadToImgBB(this)">
+                    <button type="button" onclick="document.getElementById('fileInput').click()" class="px-5 py-3 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl font-bold text-xs text-zinc-300 transition flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up text-red-500"></i> Pilih File Foto
+                    </button>
+                    <div id="uploadStatus" class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Belum ada file</div>
+                </div>
+                <input type="hidden" id="productImageUrl" required>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">APAKAH PRODUK INI BERVARIANT / BANYAK DATA?</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="setVariant(true)" id="var-true" class="var-btn py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide transition uppercase">IYA (BANYAK VARIANT)</button>
+                    <button type="button" onclick="setVariant(false)" id="var-false" class="var-btn py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide transition uppercase">TIDAK (HANYA 1 DATA)</button>
+                </div>
+                <input type="hidden" id="isVariant" required>
+            </div>
+
+            <div id="variantCountWrapper" class="space-y-2 hidden">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">PILIH JUMLAH VARIANT / DATA [MAX 15] :</label>
+                <select id="variantCount" onchange="generateFormInputs()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-bold text-white outline-none">
+                </select>
+            </div>
+
+            <div id="dynamicInputsContainer" class="space-y-4"></div>
+
+            <button type="submit" class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-xl shadow-red-600/10 active:scale-[0.99]">
+                <i class="fa-solid fa-circle-check mr-1.5"></i> SIMPAN DAN UPLOAD KE JSON
+            </button>
+
+        </form>
+    </div>
+
+    <script>
+        const IMGBB_KEY = '37e84e2162972cbe655f784aff8b9218';
+        let currentCategory = '';
+        let isVariantProduct = false;
+
+        const selectCount = document.getElementById('variantCount');
+        for (let i = 1; i <= 15; i++) {
+            let opt = document.createElement('option');
+            opt.value = i; opt.innerText = i + ' DATA VARIANT';
+            selectCount.appendChild(opt);
+        }
+
+        function generateID() {
+            return 'PRD-' + Math.floor(100000 + Math.random() * 900000);
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('selectedCategory').value = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn py-3.5 px-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide hover:text-white transition uppercase";
+            });
+            document.getElementById('cat-' + cat).className = "cat-btn py-3.5 px-3 bg-red-600/10 border border-red-500 text-red-500 rounded-xl font-black text-xs tracking-wide transition uppercase shadow-md shadow-red-500/5";
+            document.getElementById('productId').value = generateID();
+            generateFormInputs();
+        }
+
+        function setVariant(status) {
+            isVariantProduct = status;
+            document.getElementById('isVariant').value = status;
+            document.querySelectorAll('.var-btn').forEach(btn => {
+                btn.className = "var-btn py-3 bg-zinc-900 border border-zinc-800 rounded-xl font-black text-xs text-zinc-400 tracking-wide transition uppercase";
+            });
+            document.getElementById('var-' + status).className = "var-btn py-3 bg-red-600/10 border border-red-500 text-red-500 rounded-xl font-black text-xs tracking-wide transition uppercase shadow-md shadow-red-500/5";
+            
+            const wrapper = document.getElementById('variantCountWrapper');
+            if(status) {
+                wrapper.classList.remove('hidden');
+            } else {
+                wrapper.classList.add('hidden');
+                document.getElementById('variantCount').value = "1";
+            }
+            generateFormInputs();
+        }
+
+        function uploadToImgBB(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const status = document.getElementById('uploadStatus');
+            status.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-500 mr-1"></i> MENGUPLOAD...';
+            
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    let directUrl = res.data.display_url;
+                    
+                    if (directUrl.includes('i.ibb.co/')) {
+                        directUrl = directUrl.replace('i.ibb.co/', 'i.ibb.co.com/');
+                    }
+                    
+                    document.getElementById('productImageUrl').value = directUrl;
+                    status.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> TER-UPLOAD';
+                } else {
+                    status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> GAGAL UPLOAD';
+                }
+            })
+            .catch(() => {
+                status.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 mr-1"></i> ERROR NET';
+            });
+        }
+
+        function generateFormInputs() {
+            const container = document.getElementById('dynamicInputsContainer');
+            container.innerHTML = '';
+            if (!currentCategory) return;
+
+            const totalData = isVariantProduct ? parseInt(document.getElementById('variantCount').value) : 1;
+            const parentName = document.getElementById('parentName').value || 'PRODUK';
+
+            for (let i = 1; i <= totalData; i++) {
+                const itemBox = document.createElement('div');
+                itemBox.className = "p-4 bg-zinc-900/40 border border-zinc-800/80 rounded-xl space-y-3 relative";
+                
+                let titleLabel = isVariantProduct ? `MASUKAN DATA SUB-PRODUK ${i}` : `MASUKAN RINCIAN DETAIL DATA`;
+                let defaultSubName = isVariantProduct ? `${parentName} ${i}` : parentName;
+
+                let specificFields = '';
+
+                if (currentCategory === 'AKUN PREMIUM') {
+                    specificFields = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">EMAIL :</label><input type="email" name="email_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">PASSWORD :</label><input type="text" name="pw_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">HARGA :</label><input type="number" name="harga_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">STOK :</label><input type="number" name="stok_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI :</label><textarea name="deskripsi_${i}" rows="2" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></textarea></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI TAMBAHAN (OPSIONAL) :</label><input type="text" name="deskripsi_ext_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none"></div>
+                    `;
+                } else if (currentCategory === 'APLIKASI STREAMING') {
+                    specificFields = `
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">HARGA :</label><input type="number" name="harga_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">STOK :</label><input type="number" name="stok_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">LINK APK :</label><input type="url" name="link_apk_${i}" placeholder="https://" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI :</label><textarea name="deskripsi_${i}" rows="2" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></textarea></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI TAMBAHAN (OPSIONAL) :</label><input type="text" name="deskripsi_ext_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none"></div>
+                    `;
+                } else if (currentCategory === 'AKUN GAME') {
+                    specificFields = `
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">EMAIL GAME / ID :</label><input type="text" name="email_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">PW GAME :</label><input type="text" name="pw_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-1 col-span-2 gap-3">
+                                <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">HARGA :</label><input type="number" name="harga_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            </div>
+                            <div class="space-y-1 text-left">
+                                <label class="text-[10px] text-zinc-500 font-bold">STOK :</label>
+                                <input type="number" name="stok_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required>
+                            </div>
+                        </div>
+                        <div class="space-y-1 text-left">
+                            <label class="text-[10px] text-zinc-500 font-bold">A2F AUTHENTICATOR :</label>
+                            <select name="a2f_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none">
+                                <option value="OFF">OFF</option>
+                                <option value="ON">ON</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI UTAMA :</label><textarea name="deskripsi_${i}" rows="2" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></textarea></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI TAMBAHAN (OPSIONAL) :</label><input type="text" name="deskripsi_ext_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none"></div>
+                    `;
+                } else if (currentCategory === 'LAIN NYA') {
+                    specificFields = `
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-1 col-span-2 gap-3">
+                                <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">HARGA PRODUK :</label><input type="number" name="harga_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                            </div>
+                            <div class="space-y-1 text-left"><label class="text-[10px] text-zinc-500 font-bold">STOK :</label><input type="number" name="stok_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        </div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">URL / LINK PRODUK :</label><input type="url" name="url_produk_${i}" placeholder="https://" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI :</label><textarea name="deskripsi_${i}" rows="2" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required></textarea></div>
+                        <div class="space-y-1"><label class="text-[10px] text-zinc-500 font-bold">DESKRIPSI TAMBAHAN (OPSIONAL) :</label><input type="text" name="deskripsi_ext_${i}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none"></div>
+                    `;
+                }
+
+                itemBox.innerHTML = `
+                    <div class="text-[10px] font-black text-red-500 bg-red-500/10 px-2 py-1 rounded-md inline-block uppercase tracking-wider mb-2">${titleLabel}</div>
+                    <div class="space-y-1 mb-2">
+                        <label class="text-[10px] text-zinc-400 font-bold">NAMA SUB-PRODUK VARIANT :</label>
+                        <input type="text" name="sub_name_${i}" value="${defaultSubName}" class="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 text-xs font-bold text-white outline-none" required>
+                    </div>
+                    ${specificFields}
+                `;
+                container.appendChild(itemBox);
+            }
+        }
+
+        document.getElementById('parentName').addEventListener('input', () => {
+            if(!isVariantProduct) {
+                const singleSub = document.getElementsByName('sub_name_1')[0];
+                if(singleSub) singleSub.value = document.getElementById('parentName').value;
+            }
+        });
+
+        document.getElementById('productForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const category = document.getElementById('selectedCategory').value;
+            const parentId = document.getElementById('productId').value;
+            const parentName = document.getElementById('parentName').value;
+            const imageUrl = document.getElementById('productImageUrl').value;
+
+            if(!category) return alert('Silahkan pilih kategori terlebih dahulu!');
+            if(!imageUrl) return alert('Tunggu foto selesai diupload atau pasang berkas foto!');
+
+            const totalData = isVariantProduct ? parseInt(document.getElementById('variantCount').value) : 1;
+            let subProductsList = [];
+
+            for (let i = 1; i <= totalData; i++) {
+                let baseData = {
+                    subName: document.getElementsByName(`sub_name_${i}`)[0].value,
+                    harga: parseInt(document.getElementsByName(`harga_${i}`)[0]?.value || 0),
+                    stok: parseInt(document.getElementsByName(`stok_${i}`)[0]?.value || 0),
+                    deskripsi: document.getElementsByName(`deskripsi_${i}`)[0]?.value || '',
+                    deskripsiExt: document.getElementsByName(`deskripsi_ext_${i}`)[0]?.value || ''
+                };
+
+                if (category === 'AKUN PREMIUM') {
+                    baseData.email = document.getElementsByName(`email_${i}`)[0].value;
+                    baseData.pw = document.getElementsByName(`pw_${i}`)[0].value;
+                } else if (category === 'APLIKASI STREAMING') {
+                    baseData.linkApk = document.getElementsByName(`link_apk_${i}`)[0].value;
+                } else if (category === 'AKUN GAME') {
+                    baseData.email = document.getElementsByName(`email_${i}`)[0].value;
+                    baseData.pw = document.getElementsByName(`pw_${i}`)[0].value;
+                    baseData.a2f = document.getElementsByName(`a2f_${i}`)[0].value;
+                } else if (category === 'LAIN NYA') {
+                    baseData.urlProduk = document.getElementsByName(`url_produk_${i}`)[0].value;
+                }
+
+                subProductsList.push(baseData);
+            }
+
+            const finalPayload = {
+                category: category,
+                productId: parentId,
+                productName: parentName,
+                imageUrl: imageUrl,
+                isVariant: isVariantProduct,
+                items: subProductsList
+            };
+
+            fetch('/api/admin/product/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalPayload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    alert('Sukses menyimpan produk ke database json!');
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    alert('Gagal simpan: ' + res.message);
+                }
+            })
+            .catch(() => alert('Terjadi gangguan jaringan atau server mati.'));
+        });
+    </script>
+</body>
+</html>

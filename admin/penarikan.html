@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Penarikan Saldo - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;600;700;800&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1015; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen w-full flex flex-col select-none overflow-x-hidden p-4 sm:p-6">
+
+    <div class="w-full max-w-lg mx-auto bg-[#14151f] border border-zinc-800 rounded-2xl shadow-2xl p-5 sm:p-6 space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+                <a href="/admin/dashboard" class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="text-base font-black text-white tracking-wide uppercase">PENARIKAN SALDO</h1>
+                    <p class="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Withdrawal System Console</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-money-bill-transfer text-red-500 text-xl"></i>
+        </div>
+
+        <div class="bg-zinc-900/60 border border-zinc-800/80 p-4 rounded-xl flex justify-between items-center">
+            <div>
+                <span class="text-[9px] font-black text-zinc-500 uppercase tracking-wider block">SALDO PENDAPATAN ANDA :</span>
+                <span id="txtSaldoPendapatan" class="text-xl font-extrabold text-emerald-400 tracking-tight block mt-0.5">Rp 0</span>
+            </div>
+            <span class="bg-zinc-800 text-zinc-400 text-[10px] font-mono px-2 py-1 rounded border border-zinc-700/50">READY TIME</span>
+        </div>
+
+        <form id="formPenarikan" class="space-y-4">
+            
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">NOMOR TUJUAN (DATABASE MERCHANT) :</label>
+                <div class="w-full bg-zinc-900/40 border border-zinc-800 p-3.5 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span id="txtMetodeMerchant" class="inline-block text-[9px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded uppercase tracking-wider mb-1">MEMUAT...</span>
+                        <div id="txtNomerMerchant" class="text-sm font-mono font-bold text-white">-</div>
+                    </div>
+                    <i class="fa-solid fa-shield-halved text-zinc-600 text-base"></i>
+                </div>
+                <input type="hidden" id="inputMetode">
+                <input type="hidden" id="inputTujuan">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">MASUKAN NOMINAL PENARIKAN :</label>
+                <div class="relative flex items-center">
+                    <span class="absolute left-4 text-sm font-black text-zinc-500">Rp</span>
+                    <input type="number" id="inputNominal" min="10000" placeholder="Contoh: 50000" class="w-full bg-zinc-900/60 border border-zinc-800 focus:border-red-500/50 rounded-xl pl-11 pr-4 py-3.5 text-sm font-extrabold text-white placeholder-zinc-600 outline-none transition" required>
+                </div>
+                <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block px-1">Minimal penarikan adalah <span class="text-red-500">Rp 10.000</span></span>
+            </div>
+
+            <div class="p-4 bg-red-600/5 border border-red-500/20 rounded-xl space-y-1">
+                <div class="flex items-center gap-1.5 text-red-500 text-[10px] font-black uppercase tracking-wider">
+                    <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> PENTING / ATTENTION NOTICE :
+                </div>
+                <p class="text-[10px] text-zinc-400 font-bold uppercase leading-relaxed text-justify">
+                    PENARIKAN INI AKAN DI TRANSFER OWNER DALAM WAKTU 1 - 24 JAM CEK STATUS PENARIKAN DI RIWAYAT WD, SALDO AKAN TERPOTONG JIKA OWNER SUDAH TF, JIKA OWNER BELUM TF MAKA SALDO TIDAK AKAN TERPOTONG, TERIMAKASIH ATAS PERHATIAN NYA.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <a href="/admin/dashboard" class="w-full py-4 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white font-black text-xs tracking-widest rounded-xl transition uppercase text-center block">
+                    Batal
+                </a>
+                <button type="submit" class="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xs tracking-widest rounded-xl transition uppercase shadow-xl shadow-red-600/10">
+                    Konfirmasi Penarikan
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/user-session')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.valid && data.user) {
+                        const currentSaldo = parseInt(data.user.saldo || 0);
+                        document.getElementById('txtSaldoPendapatan').innerText = 'Rp ' + currentSaldo.toLocaleString('id-ID');
+                    }
+                })
+                .catch(e => console.error('Gagal sinkron saldo:', e));
+
+            fetch('/api/admin/merchant/info')
+                .then(res => res.json())
+                .then(res => {
+                    if (res && res.success && res.data) {
+                        const merchant = res.data;
+                        
+                        const mtd = merchant.metodePencairan || 'BELUM DISET';
+                        const nom = merchant.nomorPencairan || '-';
+
+                        document.getElementById('txtMetodeMerchant').innerText = mtd.toUpperCase();
+                        document.getElementById('txtNomerMerchant').innerText = nom;
+                        
+                        document.getElementById('inputMetode').value = mtd;
+                        document.getElementById('inputTujuan').value = nom;
+                    } else {
+                        document.getElementById('txtMetodeMerchant').innerText = 'ERROR';
+                        document.getElementById('txtMetodeMerchant').className = 'inline-block text-[9px] font-black bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded uppercase tracking-wider mb-1';
+                        document.getElementById('txtNomerMerchant').innerText = 'Silakan buat merchant/pengaturan WD dulu';
+                    }
+                })
+                .catch(e => {
+                    console.error('Gagal ambil data merchant:', e);
+                    document.getElementById('txtMetodeMerchant').innerText = 'DISCONNECTED';
+                });
+        });
+
+        document.getElementById('formPenarikan').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nominal = parseInt(document.getElementById('inputNominal').value || 0);
+            const metode = document.getElementById('inputMetode').value;
+            const tujuan = document.getElementById('inputTujuan').value;
+
+            if (!metode || tujuan === '-' || metode === 'BELUM DISET') {
+                alert('Gagal! Anda belum mengatur Metode/Nomor Pencairan di profil Merchant Toko Anda.');
+                return;
+            }
+
+            if (nominal < 10000) {
+                alert('Gagal! Nominal penarikan minimal Rp 10.000');
+                return;
+            }
+
+            const payload = {
+                nominal: nominal,
+                metode: metode,
+                tujuan: tujuan
+            };
+
+            fetch('/api/admin/penarikan/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    alert('Sukses! Permintaan penarikan berhasil dikirim ke Owner. Silakan tunggu diproses.');
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    alert('Gagal melakukan penarikan: ' + res.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan atau server internal error.');
+            });
+        });
+    </script>
+</body>
+</html>
